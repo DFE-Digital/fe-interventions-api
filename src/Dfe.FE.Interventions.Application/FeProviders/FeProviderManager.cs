@@ -14,29 +14,21 @@ namespace Dfe.FE.Interventions.Application.FeProviders
 
     public class FeProviderManager : IFeProviderManager
     {
-        public FeProviderManager(ILogger<FeProviderManager> logger)
+        private readonly IFeProviderRepository _feProviderRepository;
+        private readonly ILogger<FeProviderManager> _logger;
+
+        public FeProviderManager(
+            IFeProviderRepository feProviderRepository,
+            ILogger<FeProviderManager> logger)
         {
-            
+            _feProviderRepository = feProviderRepository;
+            _logger = logger;
         }
         
         public async Task<PagedSearchResult<FeProviderSynopsis>> SearchAsync(int? ukprn, string legalName, int pageNumber, CancellationToken cancellationToken)
         {
-            return new PagedSearchResult<FeProviderSynopsis>
-            {
-                Results = new[]
-                {
-                    new FeProvider
-                    {
-                        Ukprn = 12345678,
-                        LegalName = "Provider One",
-                    },
-                },
-                CurrentPage = pageNumber,
-                PageStartIndex = 1,
-                PageFinishIndex = 1,
-                TotalNumberOfPages = 1,
-                TotalNumberOfRecords = 1,
-            };
+            var result = await _feProviderRepository.SearchFeProvidersAsync(ukprn, legalName, pageNumber, 3, cancellationToken);
+            return result;
         }
     }
 }

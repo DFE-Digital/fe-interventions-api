@@ -10,6 +10,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{F5EACB08
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dfe.FE.Interventions.Api.UnitTests", "Dfe.FE.Interventions.Api.UnitTests\Dfe.FE.Interventions.Api.UnitTests.csproj", "{E384C7D9-7080-4C87-9A82-B337DE8C189F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dfe.FE.Interventions.Data", "Dfe.FE.Interventions.Data\Dfe.FE.Interventions.Data.csproj", "{9C238792-F738-4018-87F2-07CB68EB1050}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -32,6 +34,10 @@ Global
 		{E384C7D9-7080-4C87-9A82-B337DE8C189F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E384C7D9-7080-4C87-9A82-B337DE8C189F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E384C7D9-7080-4C87-9A82-B337DE8C189F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9C238792-F738-4018-87F2-07CB68EB1050}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9C238792-F738-4018-87F2-07CB68EB1050}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9C238792-F738-4018-87F2-07CB68EB1050}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9C238792-F738-4018-87F2-07CB68EB1050}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{E384C7D9-7080-4C87-9A82-B337DE8C189F} = {F5EACB08-4517-48DF-A0BE-5795580E295D}
