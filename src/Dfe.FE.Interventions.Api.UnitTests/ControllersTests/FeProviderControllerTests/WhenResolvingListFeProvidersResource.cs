@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,7 +9,6 @@ using Dfe.FE.Interventions.Application.FeProviders;
 using Dfe.FE.Interventions.Domain;
 using Dfe.FE.Interventions.Domain.FeProviders;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
@@ -56,12 +54,10 @@ namespace Dfe.FE.Interventions.Api.UnitTests.ControllersTests.FeProviderControll
             _controller.Url = _urlHelperStub;
         }
 
-        [TestCase("not-a-number")]
-        [TestCase("1234567")]
-        [TestCase("123456789")]
-        public async Task AndUkprnSpecifiedButIfNot8DigitNumberThenItShouldReturnBadRequest(string ukprn)
+        [Test]
+        public async Task AndUkprnSpecifiedButIsNotANumberThenItShouldReturnBadRequest()
         {
-            var result = await _controller.GetAsync(ukprn, null, null, CancellationToken.None);
+            var result = await _controller.GetAsync("not-a-number", null, null, CancellationToken.None);
 
             var badRequestResult = result as BadRequestObjectResult;
             var problemDetails = badRequestResult?.Value as ProblemDetails;
@@ -72,12 +68,10 @@ namespace Dfe.FE.Interventions.Api.UnitTests.ControllersTests.FeProviderControll
             Assert.AreEqual("UKPRN must be an 8 digit number", problemDetails.Detail);
         }
 
-        [TestCase("not-a-number")]
-        [TestCase("0")]
-        [TestCase("-1")]
-        public async Task AndPageNumberIsNotAPositiveNumberThenItShouldReturnBadRequest(string pageNumber)
+        [Test]
+        public async Task AndPageNumberIsNotANumberThenItShouldReturnBadRequest()
         {
-            var result = await _controller.GetAsync(null, null, pageNumber, CancellationToken.None);
+            var result = await _controller.GetAsync(null, null, "not-a-number", CancellationToken.None);
 
             var badRequestResult = result as BadRequestObjectResult;
             var problemDetails = badRequestResult?.Value as ProblemDetails;

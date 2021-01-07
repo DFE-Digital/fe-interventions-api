@@ -1,9 +1,7 @@
-﻿using System;
-using Dfe.FE.Interventions.Data.Configuration;
+﻿using Dfe.FE.Interventions.Data.Configuration;
 using Dfe.FE.Interventions.Domain.Configuration;
 using Dfe.FE.Interventions.Domain.FeProviders;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Options;
 
 namespace Dfe.FE.Interventions.Data

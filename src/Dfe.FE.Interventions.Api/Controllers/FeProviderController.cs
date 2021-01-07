@@ -39,8 +39,7 @@ namespace Dfe.FE.Interventions.Api.Controllers
         {
             // Parse UKPRN
             int? parsedUkprn = null;
-            if (!string.IsNullOrEmpty(ukprn) &&
-                (!TryParseNullableInt(ukprn, out parsedUkprn) || ukprn.Length != 8))
+            if (!string.IsNullOrEmpty(ukprn) && !TryParseNullableInt(ukprn, out parsedUkprn))
             {
                 return BadRequest(new ProblemDetails
                 {
@@ -50,8 +49,7 @@ namespace Dfe.FE.Interventions.Api.Controllers
 
             // Parse page
             var parsedPageNumber = 1;
-            if (!string.IsNullOrEmpty(page)
-                && (!int.TryParse(page, out parsedPageNumber) || parsedPageNumber < 1))
+            if (!string.IsNullOrEmpty(page) && !int.TryParse(page, out parsedPageNumber))
             {
                 return BadRequest(new ProblemDetails
                 {
@@ -59,7 +57,7 @@ namespace Dfe.FE.Interventions.Api.Controllers
                 });
             }
 
-            // Search store
+            // Execute search
             PagedSearchResult<FeProviderSynopsis> result;
             try
             {
