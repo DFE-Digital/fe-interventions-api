@@ -1,5 +1,9 @@
+using AutoMapper;
+using Dfe.FE.Interventions.Application;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -18,7 +22,25 @@ namespace Dfe.FE.Interventions.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
+            services.AddControllers().AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.IgnoreNullValues = true;
+            });
+            services.AddApiVersioning(options =>
+            {
+                options.ApiVersionReader = ApiVersionReader.Combine(
+                    new QueryStringApiVersionReader("api-version"),
+                    new HeaderApiVersionReader("api-version"));
+                
+                options.DefaultApiVersion = ApiVersion.Parse("1.0");
+                options.AssumeDefaultVersionWhenUnspecified = true;
+
+                // TODO: Use standard format for api exceptions
+            });
+
+            services.AddAutoMapper(GetType().Assembly);
+
+            services.AddFeInterventionsManagers();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
