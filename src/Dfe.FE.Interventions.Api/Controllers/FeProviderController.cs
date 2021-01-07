@@ -31,7 +31,7 @@ namespace Dfe.FE.Interventions.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAsync(
+        public async Task<IActionResult> ListAsync(
             [FromQuery] string ukprn,
             [FromQuery] string name,
             [FromQuery] string page,
@@ -80,13 +80,50 @@ namespace Dfe.FE.Interventions.Api.Controllers
             {
                 response.Links.Prev = Url.ActionLink(null, null, new {page = response.CurrentPage - 1, ukprn = parsedUkprn, name = name});
             }
+
             if (response.CurrentPage < response.TotalNumberOfPages)
             {
                 response.Links.Next = Url.ActionLink(null, null, new {page = response.CurrentPage + 1, ukprn = parsedUkprn, name = name});
             }
+
             response.Links.Last = Url.ActionLink(null, null, new {page = response.TotalNumberOfPages, ukprn = parsedUkprn, name = name});
 
             // Return
+            return Ok(response);
+        }
+
+        [HttpGet, Route("{ukprn}")]
+        public async Task<IActionResult> GetAsync(
+            string ukprn,
+            CancellationToken cancellationToken)
+        {
+            if (!int.TryParse(ukprn, out var parsedUkprn))
+            {
+                return BadRequest(new ProblemDetails
+                {
+                    Detail = "UKPRN must be an 8 digit number",
+                });
+            }
+
+            FeProvider result;
+            try
+            {
+                result = await _feProviderManager.RetrieveAsync(parsedUkprn, cancellationToken);
+            }
+            catch (InvalidRequestException ex)
+            {
+                return BadRequest(new ProblemDetails
+                {
+                    Detail = ex.Message,
+                });
+            }
+
+            var response = _mapper.Map<ApiFeProvider>(result);
+            response.Links = new ApiFeProviderLinks
+            {
+                Self = Url.ActionLink(null, null, new {ukprn}),
+            };
+
             return Ok(response);
         }
 

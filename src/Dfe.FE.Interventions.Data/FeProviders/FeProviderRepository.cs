@@ -61,5 +61,13 @@ namespace Dfe.FE.Interventions.Data.FeProviders
                 PageFinishIndex = skip + records.Count,
             };
         }
+
+        public async Task<FeProvider> RetrieveProviderAsync(int ukprn, CancellationToken cancellationToken)
+        {
+            var record = await _dbContext.FeProviders
+                .Where(x => x.Ukprn == ukprn)
+                .SingleOrDefaultAsync(cancellationToken);
+            return record;
+        }
     }
 }

@@ -45,7 +45,7 @@ namespace Dfe.FE.Interventions.Api.UnitTests.ControllersTests.FeProviderControll
 
             _loggerMock = new Mock<ILogger<FeProviderController>>();
 
-            _urlHelperStub = new UrlHelperStub();
+            _urlHelperStub = new UrlHelperStub(typeof(FeProviderController).GetMethod("ListAsync"));
 
             _controller = new FeProviderController(
                 _feProviderManagerMock.Object,
@@ -57,7 +57,7 @@ namespace Dfe.FE.Interventions.Api.UnitTests.ControllersTests.FeProviderControll
         [Test]
         public async Task AndUkprnSpecifiedButIsNotANumberThenItShouldReturnBadRequest()
         {
-            var result = await _controller.GetAsync("not-a-number", null, null, CancellationToken.None);
+            var result = await _controller.ListAsync("not-a-number", null, null, CancellationToken.None);
 
             var badRequestResult = result as BadRequestObjectResult;
             var problemDetails = badRequestResult?.Value as ProblemDetails;
@@ -71,7 +71,7 @@ namespace Dfe.FE.Interventions.Api.UnitTests.ControllersTests.FeProviderControll
         [Test]
         public async Task AndPageNumberIsNotANumberThenItShouldReturnBadRequest()
         {
-            var result = await _controller.GetAsync(null, null, "not-a-number", CancellationToken.None);
+            var result = await _controller.ListAsync(null, null, "not-a-number", CancellationToken.None);
 
             var badRequestResult = result as BadRequestObjectResult;
             var problemDetails = badRequestResult?.Value as ProblemDetails;
@@ -86,7 +86,7 @@ namespace Dfe.FE.Interventions.Api.UnitTests.ControllersTests.FeProviderControll
         public async Task ThenItShouldDefaultToPage1IfNotSpecified()
         {
             var cancellationToken = new CancellationToken();
-            await _controller.GetAsync(null, null, null, cancellationToken);
+            await _controller.ListAsync(null, null, null, cancellationToken);
 
             _feProviderManagerMock.Verify(manager => manager.SearchAsync(It.IsAny<int?>(), It.IsAny<string>(), 1, cancellationToken),
                 Times.Once);
@@ -98,7 +98,7 @@ namespace Dfe.FE.Interventions.Api.UnitTests.ControllersTests.FeProviderControll
         public async Task ThenItShouldCallManagerWithRequestedParameters(int? ukprn, string name, int pageNumber)
         {
             var cancellationToken = new CancellationToken();
-            await _controller.GetAsync(ukprn?.ToString(), name, pageNumber.ToString(), cancellationToken);
+            await _controller.ListAsync(ukprn?.ToString(), name, pageNumber.ToString(), cancellationToken);
 
             _feProviderManagerMock.Verify(manager => manager.SearchAsync(ukprn, name, pageNumber, cancellationToken),
                 Times.Once);
@@ -111,7 +111,7 @@ namespace Dfe.FE.Interventions.Api.UnitTests.ControllersTests.FeProviderControll
             _feProviderManagerMock.Setup(manager => manager.SearchAsync(It.IsAny<int?>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(source);
 
-            await _controller.GetAsync(null, null, null, CancellationToken.None);
+            await _controller.ListAsync(null, null, null, CancellationToken.None);
 
             _mapperMock.Verify(mapper => mapper.Map<ApiPagedSearchResult<FeProviderSynopsis>>(source),
                 Times.Once);
@@ -124,7 +124,7 @@ namespace Dfe.FE.Interventions.Api.UnitTests.ControllersTests.FeProviderControll
             _mapperMock.Setup(mapper => mapper.Map<ApiPagedSearchResult<FeProviderSynopsis>>(It.IsAny<PagedSearchResult<FeProviderSynopsis>>()))
                 .Returns(mapped);
 
-            var result = await _controller.GetAsync(null, null, "1", CancellationToken.None);
+            var result = await _controller.ListAsync(null, null, "1", CancellationToken.None);
 
             var okObjectResult = result as OkObjectResult;
             var actual = okObjectResult?.Value as ApiPagedSearchResult<FeProviderSynopsis>;
@@ -146,7 +146,7 @@ namespace Dfe.FE.Interventions.Api.UnitTests.ControllersTests.FeProviderControll
             _mapperMock.Setup(mapper => mapper.Map<ApiPagedSearchResult<FeProviderSynopsis>>(It.IsAny<PagedSearchResult<FeProviderSynopsis>>()))
                 .Returns(mapped);
 
-            var result = await _controller.GetAsync(ukprn?.ToString(), name, "1", CancellationToken.None);
+            var result = await _controller.ListAsync(ukprn?.ToString(), name, "1", CancellationToken.None);
 
             var expectedCriteriaUrl = EncodeCriteriaForLinkUrl(ukprn, name);
 
@@ -175,7 +175,7 @@ namespace Dfe.FE.Interventions.Api.UnitTests.ControllersTests.FeProviderControll
             _mapperMock.Setup(mapper => mapper.Map<ApiPagedSearchResult<FeProviderSynopsis>>(It.IsAny<PagedSearchResult<FeProviderSynopsis>>()))
                 .Returns(mapped);
 
-            var result = await _controller.GetAsync(ukprn?.ToString(), name, currentPage.ToString(), CancellationToken.None);
+            var result = await _controller.ListAsync(ukprn?.ToString(), name, currentPage.ToString(), CancellationToken.None);
 
             var expectedCriteriaUrl = EncodeCriteriaForLinkUrl(ukprn, name);
 
@@ -204,7 +204,7 @@ namespace Dfe.FE.Interventions.Api.UnitTests.ControllersTests.FeProviderControll
             _mapperMock.Setup(mapper => mapper.Map<ApiPagedSearchResult<FeProviderSynopsis>>(It.IsAny<PagedSearchResult<FeProviderSynopsis>>()))
                 .Returns(mapped);
 
-            var result = await _controller.GetAsync(ukprn?.ToString(), name, currentPage.ToString(), CancellationToken.None);
+            var result = await _controller.ListAsync(ukprn?.ToString(), name, currentPage.ToString(), CancellationToken.None);
 
             var expectedCriteriaUrl = EncodeCriteriaForLinkUrl(ukprn, name);
 
@@ -230,7 +230,7 @@ namespace Dfe.FE.Interventions.Api.UnitTests.ControllersTests.FeProviderControll
             _mapperMock.Setup(mapper => mapper.Map<ApiPagedSearchResult<FeProviderSynopsis>>(It.IsAny<PagedSearchResult<FeProviderSynopsis>>()))
                 .Returns(mapped);
 
-            var result = await _controller.GetAsync(ukprn?.ToString(), name, "1", CancellationToken.None);
+            var result = await _controller.ListAsync(ukprn?.ToString(), name, "1", CancellationToken.None);
 
             var expectedCriteriaUrl = EncodeCriteriaForLinkUrl(ukprn, name);
 
@@ -250,7 +250,7 @@ namespace Dfe.FE.Interventions.Api.UnitTests.ControllersTests.FeProviderControll
             _feProviderManagerMock.Setup(manager => manager.SearchAsync(It.IsAny<int?>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(exception);
             
-            var result = await _controller.GetAsync(null, null, "1", CancellationToken.None);
+            var result = await _controller.ListAsync(null, null, "1", CancellationToken.None);
 
             var badRequestResult = result as BadRequestObjectResult;
             var problemDetails = badRequestResult?.Value as ProblemDetails;

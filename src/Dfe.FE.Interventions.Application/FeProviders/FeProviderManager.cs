@@ -9,6 +9,7 @@ namespace Dfe.FE.Interventions.Application.FeProviders
     public interface IFeProviderManager
     {
         Task<PagedSearchResult<FeProviderSynopsis>> SearchAsync(int? ukprn, string legalName, int pageNumber, CancellationToken cancellationToken);
+        Task<FeProvider> RetrieveAsync(int ukprn, CancellationToken cancellationToken);
     }
 
     public class FeProviderManager : IFeProviderManager
@@ -44,6 +45,17 @@ namespace Dfe.FE.Interventions.Application.FeProviders
             }
             
             return result;
+        }
+
+        public async Task<FeProvider> RetrieveAsync(int ukprn, CancellationToken cancellationToken)
+        {
+            if (ukprn < 10000000 || ukprn > 99999999)
+            {
+                throw new InvalidRequestException("UKPRN must be an 8 digit number");
+            }
+
+            var provider = await _feProviderRepository.RetrieveProviderAsync(ukprn, cancellationToken);
+            return provider;
         }
     }
 }
