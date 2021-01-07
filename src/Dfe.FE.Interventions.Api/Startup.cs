@@ -16,15 +16,15 @@ namespace Dfe.FE.Interventions.Api
 {
     public class Startup
     {
+        private readonly IConfiguration _configuration;
+        
         public Startup(IConfiguration configuration)
         {
-            Configuration = new ConfigurationBuilder()
+            _configuration = new ConfigurationBuilder()
                 .AddConfiguration(configuration)
                 .AddEnvironmentVariables()
                 .Build();
         }
-
-        public IConfiguration Configuration { get; }
 
         public void ConfigureServices(IServiceCollection services)
         {
@@ -45,7 +45,7 @@ namespace Dfe.FE.Interventions.Api
             });
 
             services.AddOptions();
-            services.Configure<DataStoreConfiguration>(Configuration.GetSection("DataStore"));
+            services.Configure<DataStoreConfiguration>(_configuration.GetSection("DataStore"));
 
             services.AddDbContext<FeInterventionsDbContext>();
             services.AddScoped<IFeInterventionsDbContext, FeInterventionsDbContext>();

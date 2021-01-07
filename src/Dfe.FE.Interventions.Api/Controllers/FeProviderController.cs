@@ -73,20 +73,21 @@ namespace Dfe.FE.Interventions.Api.Controllers
 
             // Map results to response
             var response = _mapper.Map<ApiPagedSearchResult<FeProviderSynopsis>>(result);
-            response.Links = new ApiPagedSearchResultLinks();
+            response.Links = new ApiPagedSearchResultLinks
+            {
+                First = Url.ActionLink(null, null, new {page = 1, ukprn = parsedUkprn, name}),
+                Last = Url.ActionLink(null, null, new {page = response.TotalNumberOfPages, ukprn = parsedUkprn, name}),
+            };
 
-            response.Links.First = Url.ActionLink(null, null, new {page = 1, ukprn = parsedUkprn, name = name});
             if (response.CurrentPage > 1)
             {
-                response.Links.Prev = Url.ActionLink(null, null, new {page = response.CurrentPage - 1, ukprn = parsedUkprn, name = name});
+                response.Links.Prev = Url.ActionLink(null, null, new {page = response.CurrentPage - 1, ukprn = parsedUkprn, name});
             }
 
             if (response.CurrentPage < response.TotalNumberOfPages)
             {
-                response.Links.Next = Url.ActionLink(null, null, new {page = response.CurrentPage + 1, ukprn = parsedUkprn, name = name});
+                response.Links.Next = Url.ActionLink(null, null, new {page = response.CurrentPage + 1, ukprn = parsedUkprn, name});
             }
-
-            response.Links.Last = Url.ActionLink(null, null, new {page = response.TotalNumberOfPages, ukprn = parsedUkprn, name = name});
 
             // Return
             return Ok(response);

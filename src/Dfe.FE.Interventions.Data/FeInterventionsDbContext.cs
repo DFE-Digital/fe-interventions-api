@@ -13,7 +13,7 @@ namespace Dfe.FE.Interventions.Data
     
     public class FeInterventionsDbContext : DbContext, IFeInterventionsDbContext
     {
-        private DataStoreConfiguration _config;
+        private readonly DataStoreConfiguration _config;
 
         public FeInterventionsDbContext(
             IOptions<DataStoreConfiguration> config,

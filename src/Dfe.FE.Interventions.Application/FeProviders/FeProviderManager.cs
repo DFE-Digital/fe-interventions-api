@@ -40,7 +40,7 @@ namespace Dfe.FE.Interventions.Application.FeProviders
             var result = await _feProviderRepository.SearchFeProvidersAsync(ukprn, legalName, pageNumber, PaginationConstants.PageSize, cancellationToken);
             if (pageNumber > result.TotalNumberOfPages)
             {
-                throw new InvalidRequestException($"Page number exceeds available pages. " +
+                throw new InvalidRequestException("Page number exceeds available pages. " +
                                                   $"Requested page {pageNumber}, but only {result.TotalNumberOfPages} pages available");
             }
             
