@@ -71,3 +71,15 @@ jobs:
       displayName: 'Publish Database Artifact'
       inputs:
         PathtoPublish: '$(build.artifactstagingdirectory)/Dfe.FE.Interventions.Database.$(Build.BuildId)'
+
+- job: Templates
+  steps:
+    - task: CopyFiles@2
+      inputs:
+        SourceFolder: 'azure'
+        TargetFolder: '$(build.artifactstagingdirectory)/templates'
+
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Templates Artifact'
+      inputs:
+        PathtoPublish: '$(build.artifactstagingdirectory)/templates'
