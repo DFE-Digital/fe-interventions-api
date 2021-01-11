@@ -12,49 +12,49 @@ variables:
   buildPlatform: 'Any CPU'
 
 jobs:
-  - job: 'API'
-    steps:
-      - task: NuGetCommand@2
-        displayName: 'Restore NuGet Packages'
-        inputs:
-          command: 'restore'
-          restoreSolution: '**/*.sln'
-    
-      - task: DotNetCoreCLI@2
-        displayName: 'Build code'
-        inputs:
-          projects: 'src/**/*.csproj'
-          arguments: '--configuration $(buildConfiguration) --no-restore'
-    
-      - task: DotNetCoreCLI@2
-        displayName: Test
-        inputs:
-          command: test
-          projects: 'src/**/*.*Tests.csproj'
-          arguments: '--configuration $(buildConfiguration) --no-build'
-    
-      - task: DotNetCoreCLI@2
-        displayName: 'Publish Web app'
-        inputs:
-          command: publish
-          publishWebProjects: false
-          projects: 'src/Dfe.FE.Interventions.Api/Dfe.FE.Interventions.Api.csproj'
-          arguments: '--configuration $(buildConfiguration) --output $(build.artifactstagingdirectory)/Dfe.FE.Interventions.Api.$(Build.BuildId) --no-restore --no-build'
-          zipAfterPublish: true
-          modifyOutputPath: false
-    
-      - task: PublishBuildArtifacts@1
-        displayName: 'Publish Artifact'
-        inputs:
-          PathtoPublish: '$(build.artifactstagingdirectory)/Dfe.FE.Interventions.Api.$(Build.BuildId)'
-          
-  - job: 'Database'
-    pool: 'Hosted VS2017'
-    steps:
-      - task: VSBuild@1
-        displayName: 'Publish DACPAC'
-        inputs:
-          solution: 'src/Dfe.FE.Interventions.Database/Dfe.FE.Interventions.Database.sqlproj'
-          platform: '$(buildPlatform)'
-          configuration: '$(buildConfiguration)'
-          msbuildArgs: '/p:PackageLocation="$(build.artifactstagingdirectory)/Dfe.FE.Interventions.Database.$(Build.BuildId)"'
+- job: API
+  steps:
+    - task: NuGetCommand@2
+      displayName: 'Restore NuGet Packages'
+      inputs:
+        command: 'restore'
+        restoreSolution: '**/*.sln'
+  
+    - task: DotNetCoreCLI@2
+      displayName: 'Build code'
+      inputs:
+        projects: 'src/**/*.csproj'
+        arguments: '--configuration $(buildConfiguration) --no-restore'
+  
+    - task: DotNetCoreCLI@2
+      displayName: Test
+      inputs:
+        command: test
+        projects: 'src/**/*.*Tests.csproj'
+        arguments: '--configuration $(buildConfiguration) --no-build'
+  
+    - task: DotNetCoreCLI@2
+      displayName: 'Publish Web app'
+      inputs:
+        command: publish
+        publishWebProjects: false
+        projects: 'src/Dfe.FE.Interventions.Api/Dfe.FE.Interventions.Api.csproj'
+        arguments: '--configuration $(buildConfiguration) --output $(build.artifactstagingdirectory)/Dfe.FE.Interventions.Api.$(Build.BuildId) --no-restore --no-build'
+        zipAfterPublish: true
+        modifyOutputPath: false
+  
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Artifact'
+      inputs:
+        PathtoPublish: '$(build.artifactstagingdirectory)/Dfe.FE.Interventions.Api.$(Build.BuildId)'
+        
+- job: Database
+  pool: 'Hosted VS2017'
+  steps:
+    - task: VSBuild@1
+      displayName: 'Publish DACPAC'
+      inputs:
+        solution: 'src/Dfe.FE.Interventions.Database/Dfe.FE.Interventions.Database.sqlproj'
+        platform: '$(buildPlatform)'
+        configuration: '$(buildConfiguration)'
+        msbuildArgs: '/p:PackageLocation="$(build.artifactstagingdirectory)/Dfe.FE.Interventions.Database.$(Build.BuildId)"'
