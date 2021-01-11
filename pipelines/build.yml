@@ -37,7 +37,7 @@ steps:
       command: publish
       publishWebProjects: false
       projects: 'src/Dfe.FE.Interventions.Api/Dfe.FE.Interventions.Api.csproj'
-      arguments: '--configuration $(buildConfiguration) --output $(build.artifactstagingdirectory)/publish --no-restore --no-build'
+      arguments: '--configuration $(buildConfiguration) --output $(build.artifactstagingdirectory)/Dfe.FE.Interventions.Api.$(Build.BuildId) --no-restore --no-build'
       zipAfterPublish: true
       modifyOutputPath: false
 
