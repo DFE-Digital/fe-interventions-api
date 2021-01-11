@@ -63,7 +63,7 @@ jobs:
 
     - task: CopyFiles@2
       inputs:
-        SourceFolder: 'src/Dfe.FE.Interventions.Database/bin/$(buildConfiguration)'
+        SourceFolder: 'src/Dfe.FE.Interventions.Database/bin/Output'
         Contents: '*.dacpac'
         TargetFolder: '$(build.artifactstagingdirectory)/Dfe.FE.Interventions.Database.$(Build.BuildId)'
 
