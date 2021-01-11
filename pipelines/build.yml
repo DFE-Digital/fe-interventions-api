@@ -6,6 +6,8 @@ trigger:
 
 workspace:
   clean: all
+  
+pool: 'Hosted VS2017'
 
 variables:
   buildConfiguration: 'Release'
@@ -40,6 +42,14 @@ steps:
       arguments: '--configuration $(buildConfiguration) --output $(build.artifactstagingdirectory)/Dfe.FE.Interventions.Api.$(Build.BuildId) --no-restore --no-build'
       zipAfterPublish: true
       modifyOutputPath: false
+      
+  - task: VSBuild@1
+    displayName: 'Publish DACPAC'
+    inputs:
+      solution: 'src/Dfe.FE.Interventions.Database/Dfe.FE.Interventions.Database.sqlproj'
+      platform: '$(buildPlatform)'
+      configuration: '$(buildConfiguration)'
+      msbuildArgs: '/p:PackageLocation="$(build.artifactstagingdirectory)/Dfe.FE.Interventions.Database.$(Build.BuildId)"'
 
   - task: PublishBuildArtifacts@1
     displayName: 'Publish Artifact'
