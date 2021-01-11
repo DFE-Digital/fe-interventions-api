@@ -7,7 +7,7 @@ trigger:
 workspace:
   clean: all
   
-pool: 'Hosted VS2017'
+pool: 'Hosted VS2019'
 
 variables:
   buildConfiguration: 'Release'
