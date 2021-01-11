@@ -45,7 +45,7 @@ jobs:
         modifyOutputPath: false
   
     - task: PublishBuildArtifacts@1
-      displayName: 'Publish Artifact'
+      displayName: 'Publish API Artifact'
       inputs:
         PathtoPublish: '$(build.artifactstagingdirectory)/Dfe.FE.Interventions.Api.$(Build.BuildId)'
         
@@ -64,3 +64,8 @@ jobs:
         platform: '$(buildPlatform)'
         configuration: '$(buildConfiguration)'
         msbuildArgs: '/p:PackageLocation="$(build.artifactstagingdirectory)/Dfe.FE.Interventions.Database.$(Build.BuildId)"'
+
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Database Artifact'
+      inputs:
+        PathtoPublish: '$(build.artifactstagingdirectory)/Dfe.FE.Interventions.Database.$(Build.BuildId)'
