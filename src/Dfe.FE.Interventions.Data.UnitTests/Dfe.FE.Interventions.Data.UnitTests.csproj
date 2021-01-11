@@ -20,10 +20,4 @@
       <ProjectReference Include="..\Dfe.FE.Interventions.Domain\Dfe.FE.Interventions.Domain.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Reference Include="AutoFixture.NUnit3, Version=4.15.0.0, Culture=neutral, PublicKeyToken=b24654c590009d4f">
-        <HintPath>..\..\..\..\..\.nuget\packages\autofixture.nunit3\4.15.0\lib\netstandard2.0\AutoFixture.NUnit3.dll</HintPath>
-      </Reference>
-    </ItemGroup>
-
 </Project>
