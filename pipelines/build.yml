@@ -4,15 +4,16 @@ trigger:
     include:
       - "*"
 
-workspace:
-  clean: all
   
-variables:
-  buildConfiguration: 'Release'
-  buildPlatform: 'Any CPU'
+
 
 jobs:
 - job: API
+  workspace:
+    clean: all
+  variables:
+    buildConfiguration: 'Release'
+    buildPlatform: 'Any CPU'
   steps:
     - task: NuGetCommand@2
       displayName: 'Restore NuGet Packages'
@@ -49,6 +50,11 @@ jobs:
         PathtoPublish: '$(build.artifactstagingdirectory)/Dfe.FE.Interventions.Api.$(Build.BuildId)'
         
 - job: Database
+  workspace:
+    clean: all
+  variables:
+    buildConfiguration: 'Release'
+    buildPlatform: 'Any CPU'
   pool: 'Hosted VS2017'
   steps:
     - task: VSBuild@1
