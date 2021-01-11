@@ -87,7 +87,7 @@ namespace Dfe.FE.Interventions.Application.UnitTests.FeProvidersTests.FeProvider
         }
         
         [Test]
-        public async Task AndPageNumberExceedsTotalNumberOfPagesThenItShouldThrowAnInvalidRequestException()
+        public void AndPageNumberExceedsTotalNumberOfPagesThenItShouldThrowAnInvalidRequestException()
         {
             _feProviderRepositoryMock
                 .Setup(repo => repo.SearchFeProvidersAsync(It.IsAny<int?>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>(),
