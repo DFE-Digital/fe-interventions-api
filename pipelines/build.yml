@@ -4,9 +4,6 @@ trigger:
     include:
       - "*"
 
-  
-
-
 jobs:
 - job: API
   workspace:
@@ -63,7 +60,12 @@ jobs:
         solution: 'src/Dfe.FE.Interventions.Database/Dfe.FE.Interventions.Database.sqlproj'
         platform: '$(buildPlatform)'
         configuration: '$(buildConfiguration)'
-        msbuildArgs: '/p:PackageLocation="$(build.artifactstagingdirectory)/Dfe.FE.Interventions.Database.$(Build.BuildId)"'
+
+    - task: CopyFiles@2
+      inputs:
+        SourceFolder: 'src/Dfe.FE.Interventions.Database/bin/$(buildConfiguration)'
+        Contents: '*.dacpac'
+        TargetFolder: '$(build.artifactstagingdirectory)/Dfe.FE.Interventions.Database.$(Build.BuildId)'
 
     - task: PublishBuildArtifacts@1
       displayName: 'Publish Database Artifact'
