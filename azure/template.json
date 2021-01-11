@@ -111,18 +111,6 @@
         "storageAccountType": "GRS"
       }
     },
-    {
-      "type": "Microsoft.Sql/servers/virtualNetworkRules",
-      "apiVersion": "2015-05-01-preview",
-      "name": "[concat(variables('sqlServerName'), '/FEApiSubnet')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Sql/servers', variables('sqlServerName'))]"
-      ],
-      "properties": {
-        "virtualNetworkSubnetId": "[variables('subnetId')]",
-        "ignoreMissingVnetServiceEndpoint": false
-      }
-    },
     
     {
       "type": "Microsoft.Web/serverfarms",
