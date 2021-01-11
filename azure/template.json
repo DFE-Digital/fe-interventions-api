@@ -44,6 +44,9 @@
       "minLength": 2,
       "maxLength": 2
     },
+    "sqlAdminUsername": {
+      "type": "securestring"
+    },
     "sqlAdminPassword": {
       "type": "securestring",
       "minLength": 12
@@ -75,7 +78,7 @@
       },
       "kind": "v12.0",
       "properties": {
-        "administratorLogin": "feadmin",
+        "administratorLogin": "[parameters('sqlAdminUsername')]",
         "administratorLoginPassword": "[parameters('sqlAdminPassword')]",
         "version": "12.0",
         "publicNetworkAccess": "Enabled"
@@ -194,6 +197,10 @@
             {
               "Name": "APPINSIGHTS_INSTRUMENTATIONKEY",
               "Value": "[reference(resourceId(variables('sharedResourceGroupName'), 'microsoft.insights/components/', variables('appInsightsName')), '2015-05-01').InstrumentationKey]"
+            },
+            {
+              "Name": "DataStore__ConnectionString",
+              "Value": "[concat('server=', variables('sqlServerName'), ';database=', variables('sqlServerDatabase'), ';user id=', parameters('sqlAdminUsername'), ';password=', parameters('sqlAdminPassword'))]"
             }
           ]
         }
