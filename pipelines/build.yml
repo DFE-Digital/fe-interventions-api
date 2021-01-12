@@ -1,0 +1,85 @@
+trigger:
+  batch: true
+  branches:
+    include:
+      - "*"
+
+jobs:
+- job: API
+  workspace:
+    clean: all
+  variables:
+    buildConfiguration: 'Release'
+    buildPlatform: 'Any CPU'
+  steps:
+    - task: NuGetCommand@2
+      displayName: 'Restore NuGet Packages'
+      inputs:
+        command: 'restore'
+        restoreSolution: '**/*.sln'
+  
+    - task: DotNetCoreCLI@2
+      displayName: 'Build code'
+      inputs:
+        projects: 'src/**/*.csproj'
+        arguments: '--configuration $(buildConfiguration) --no-restore'
+  
+    - task: DotNetCoreCLI@2
+      displayName: Test
+      inputs:
+        command: test
+        projects: 'src/**/*.*Tests.csproj'
+        arguments: '--configuration $(buildConfiguration) --no-build'
+  
+    - task: DotNetCoreCLI@2
+      displayName: 'Publish Web app'
+      inputs:
+        command: publish
+        publishWebProjects: false
+        projects: 'src/Dfe.FE.Interventions.Api/Dfe.FE.Interventions.Api.csproj'
+        arguments: '--configuration $(buildConfiguration) --output $(build.artifactstagingdirectory)/Dfe.FE.Interventions.Api.$(Build.BuildId) --no-restore --no-build'
+        zipAfterPublish: true
+        modifyOutputPath: false
+  
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish API Artifact'
+      inputs:
+        PathtoPublish: '$(build.artifactstagingdirectory)/Dfe.FE.Interventions.Api.$(Build.BuildId)'
+        
+- job: Database
+  workspace:
+    clean: all
+  variables:
+    buildConfiguration: 'Release'
+    buildPlatform: 'Any CPU'
+  pool: 'Hosted VS2017'
+  steps:
+    - task: VSBuild@1
+      displayName: 'Publish DACPAC'
+      inputs:
+        solution: 'src/Dfe.FE.Interventions.Database/Dfe.FE.Interventions.Database.sqlproj'
+        platform: '$(buildPlatform)'
+        configuration: '$(buildConfiguration)'
+
+    - task: CopyFiles@2
+      inputs:
+        SourceFolder: 'src/Dfe.FE.Interventions.Database/bin/Output'
+        Contents: '*.dacpac'
+        TargetFolder: '$(build.artifactstagingdirectory)/Dfe.FE.Interventions.Database.$(Build.BuildId)'
+
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Database Artifact'
+      inputs:
+        PathtoPublish: '$(build.artifactstagingdirectory)/Dfe.FE.Interventions.Database.$(Build.BuildId)'
+
+- job: Templates
+  steps:
+    - task: CopyFiles@2
+      inputs:
+        SourceFolder: 'azure'
+        TargetFolder: '$(build.artifactstagingdirectory)/templates'
+
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Templates Artifact'
+      inputs:
+        PathtoPublish: '$(build.artifactstagingdirectory)/templates'
