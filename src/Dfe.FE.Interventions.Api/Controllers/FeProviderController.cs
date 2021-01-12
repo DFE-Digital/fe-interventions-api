@@ -61,7 +61,13 @@ namespace Dfe.FE.Interventions.Api.Controllers
             PagedSearchResult<FeProviderSynopsis> result;
             try
             {
+                _logger.LogInformation("Searching for providers. Ukprn: {UKPRN}, Name: {Name}, PageNumber: {PageNumber}",
+                    parsedUkprn, name, parsedPageNumber);
+                
                 result = await _feProviderManager.SearchAsync(parsedUkprn, name, parsedPageNumber, cancellationToken);
+                
+                _logger.LogInformation("Returning {NumberOfResults} providers",
+                    result.Results?.Length ?? 0);
             }
             catch (InvalidRequestException ex)
             {
