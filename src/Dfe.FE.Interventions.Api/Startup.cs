@@ -1,4 +1,5 @@
 using AutoMapper;
+using Dfe.FE.Interventions.Api.Infrastructure.Middleware;
 using Dfe.FE.Interventions.Application;
 using Dfe.FE.Interventions.Data;
 using Dfe.FE.Interventions.Data.FeProviders;
@@ -68,6 +69,8 @@ namespace Dfe.FE.Interventions.Api
             }
 
             app.UseRouting();
+
+            app.UseLoggingCorrelation();
 
             app.UseAuthorization();
 
