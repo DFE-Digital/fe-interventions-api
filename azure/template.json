@@ -200,7 +200,7 @@
             },
             {
               "Name": "DataStore__ConnectionString",
-              "Value": "[concat('server=', variables('sqlServerName'), ';database=', variables('sqlDatabaseName'), ';user id=', parameters('sqlAdminUsername'), ';password=', parameters('sqlAdminPassword'))]"
+              "Value": "[concat('server=', variables('sqlServerName'), '.database.windows.net;database=', variables('sqlDatabaseName'), ';user id=', parameters('sqlAdminUsername'), ';password=', parameters('sqlAdminPassword'))]"
             }
           ]
         }
