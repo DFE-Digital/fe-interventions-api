@@ -14,10 +14,6 @@ namespace Dfe.FE.Interventions.Api
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseKestrel(options =>
-                    {
-                        options.AddServerHeader = false;
-                    });
                     webBuilder.UseStartup<Startup>();
                 });
     }
