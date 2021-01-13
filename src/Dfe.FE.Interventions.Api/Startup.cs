@@ -29,6 +29,7 @@ namespace Dfe.FE.Interventions.Api
 
         public void ConfigureServices(IServiceCollection services)
         {
+            // Setup controllers
             services.AddControllers().AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.IgnoreNullValues = true;
@@ -45,15 +46,22 @@ namespace Dfe.FE.Interventions.Api
                 // TODO: Use standard format for api exceptions
             });
 
+            // Setup config
             services.AddOptions();
             services.Configure<DataStoreConfiguration>(_configuration.GetSection("DataStore"));
+            
+            // Setup logging + telemetry
+            services.AddApplicationInsightsTelemetry();
 
+            // Setup database
             services.AddDbContext<FeInterventionsDbContext>();
             services.AddScoped<IFeInterventionsDbContext, FeInterventionsDbContext>();
             services.AddScoped<IFeProviderRepository, FeProviderRepository>();
 
+            // Setup mapper
             services.AddAutoMapper(GetType().Assembly);
 
+            // Setup application layer
             services.AddFeInterventionsManagers();
         }
 
