@@ -18,11 +18,11 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Content Include="Web.config">
+      <None Include="Web.config">
         <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-      </Content>
+<!--        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>-->
+      </None>
     </ItemGroup>
 
 
