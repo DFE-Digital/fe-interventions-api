@@ -50,6 +50,15 @@
     "sqlAdminPassword": {
       "type": "securestring",
       "minLength": 12
+    },
+    "sqlAdUsername": {
+      "type": "securestring"
+    },
+    "sqlAdUserSid": {
+      "type": "securestring"
+    },
+    "sqlAdUserTenant": {
+      "type": "securestring"
     }
   },
   "variables": {
@@ -121,6 +130,20 @@
       "properties": {
         "virtualNetworkSubnetId": "[variables('subnetId')]",
         "ignoreMissingVnetServiceEndpoint": false
+      }
+    },
+    {
+      "type": "Microsoft.Sql/servers/administrators",
+      "apiVersion": "2019-06-01-preview",
+      "name": "[concat(variables('sqlServerName'), '/ActiveDirectory')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers', variables('sqlServerName'))]"
+      ],
+      "properties": {
+        "administratorType": "ActiveDirectory",
+        "login": "[parameters('sqlAdUsername')]",
+        "sid": "[parameters('sqlAdUserSid')]",
+        "tenantId": "[parameters('sqlAdUserTenant')]"
       }
     },
     
