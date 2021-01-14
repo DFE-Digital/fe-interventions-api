@@ -51,13 +51,13 @@
       "type": "securestring",
       "minLength": 12
     },
-    "sqlAdUsername": {
+    "sqlAdAdminName": {
       "type": "securestring"
     },
-    "sqlAdUserSid": {
+    "sqlAdAdminSid": {
       "type": "securestring"
     },
-    "sqlAdUserTenant": {
+    "sqlAdAdminTenant": {
       "type": "securestring"
     }
   },
@@ -141,9 +141,9 @@
       ],
       "properties": {
         "administratorType": "ActiveDirectory",
-        "login": "[parameters('sqlAdUsername')]",
-        "sid": "[parameters('sqlAdUserSid')]",
-        "tenantId": "[parameters('sqlAdUserTenant')]"
+        "login": "[parameters('sqlAdAdminName')]",
+        "sid": "[parameters('sqlAdAdminSid')]",
+        "tenantId": "[parameters('sqlAdAdminTenant')]"
       }
     },
     
