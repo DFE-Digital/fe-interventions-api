@@ -26,6 +26,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Release", "Release", "{07A6AC2A-546F-4A7C-9E3A-E586EAC121C9}"
 ProjectSection(SolutionItems) = preProject
 	..\azure\template.json = ..\azure\template.json
+	..\azure\SetupAdUserInSql.ps1 = ..\azure\SetupAdUserInSql.ps1
 EndProjectSection
 EndProject
 Global
