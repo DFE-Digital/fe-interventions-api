@@ -1,0 +1,13 @@
+CREATE TABLE [dbo].[Learner]
+(
+  [Id] UNIQUEIDENTIFIER NOT NULL PRIMARY KEY,
+  [UKPRN] INT NOT NULL,
+  [LearnRefNumber] NVARCHAR(50) NOT NULL,
+  [ULN] BIGINT NOT NULL,
+  [FistNames] NVARCHAR(255) NULL,
+  [LastName] NVARCHAR(255) NULL,
+  [DateOfBirth] DATETIME NULL,
+  [NationalInsuranceNumber] VARCHAR(9) NULL,
+
+  CONSTRAINT [FK_Learner_FeProvider] FOREIGN KEY (UKPRN) REFERENCES [dbo].[FeProvider](UKPRN)
+)

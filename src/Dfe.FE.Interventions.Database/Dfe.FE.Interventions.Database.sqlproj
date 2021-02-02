@@ -68,5 +68,7 @@
   </Target>
   <ItemGroup>
     <Build Include="dbo\Tables\FeProvider.sql"/>
+    <Build Include="dbo\Tables\Learner.sql"/>
+    <Build Include="dbo\Tables\LearningDelivery.sql"/>
   </ItemGroup>
 </Project>
