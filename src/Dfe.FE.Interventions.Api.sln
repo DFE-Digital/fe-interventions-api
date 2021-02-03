@@ -29,6 +29,8 @@ ProjectSection(SolutionItems) = preProject
 	..\azure\SetupAdUserInSql.ps1 = ..\azure\SetupAdUserInSql.ps1
 EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dfe.FE.Interventions.Consumer.Ukrlp", "Dfe.FE.Interventions.Consumer.Ukrlp\Dfe.FE.Interventions.Consumer.Ukrlp.csproj", "{03734867-69AE-4F62-8AAE-DD5A6BE4E906}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -63,6 +65,10 @@ Global
 		{EDDEC343-1D84-45F3-AB23-7359A1B12AAA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EDDEC343-1D84-45F3-AB23-7359A1B12AAA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EDDEC343-1D84-45F3-AB23-7359A1B12AAA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{03734867-69AE-4F62-8AAE-DD5A6BE4E906}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{03734867-69AE-4F62-8AAE-DD5A6BE4E906}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{03734867-69AE-4F62-8AAE-DD5A6BE4E906}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{03734867-69AE-4F62-8AAE-DD5A6BE4E906}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{E384C7D9-7080-4C87-9A82-B337DE8C189F} = {F5EACB08-4517-48DF-A0BE-5795580E295D}
