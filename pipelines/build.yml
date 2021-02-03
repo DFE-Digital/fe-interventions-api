@@ -63,7 +63,7 @@ jobs:
     - task: PublishBuildArtifacts@1
       displayName: 'Publish API Artifact'
       inputs:
-        PathtoPublish: '$(build.artifactstagingdirectory)/Dfe.FE.Interventions.Api.$(Build.BuildId)'
+        PathtoPublish: '$(build.artifactstagingdirectory)'
         
 - job: Database
   workspace:
