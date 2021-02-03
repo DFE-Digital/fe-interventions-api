@@ -37,7 +37,7 @@ jobs:
         command: publish
         publishWebProjects: false
         projects: 'src/Dfe.FE.Interventions.Api/Dfe.FE.Interventions.Api.csproj'
-        arguments: '--configuration $(buildConfiguration) --output $(Build.StagingDirectory)/publish/Dfe.FE.Interventions.Api.$(Build.BuildId) --no-restore --no-build'
+        arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/publish --no-restore --no-build'
         zipAfterPublish: false
         modifyOutputPath: false
         
@@ -47,23 +47,23 @@ jobs:
         command: publish
         publishWebProjects: false
         projects: 'src/Dfe.FE.Interventions.Consumer.Ukrlp/Dfe.FE.Interventions.Consumer.Ukrlp.csproj'
-        arguments: '--configuration $(buildConfiguration) --self-contained --output $(Build.StagingDirectory)/publish/Dfe.FE.Interventions.Api.$(Build.BuildId)/App_Data/jobs/continuous/UkrlpConsumer --no-restore --no-build'
+        arguments: '--configuration $(buildConfiguration) --self-contained --output $(Build.ArtifactStagingDirectory)/publish/App_Data/jobs/continuous/UkrlpConsumer --no-restore --no-build'
         zipAfterPublish: false
         modifyOutputPath: false
 
     - task: ArchiveFiles@2
       displayName: 'Zip App'
       inputs:
-        rootFolderOrFile: '$(Build.StagingDirectory)/publish/Dfe.FE.Interventions.Api.$(Build.BuildId)'
+        rootFolderOrFile: '$(Build.ArtifactStagingDirectory)/publish/'
         includeRootFolder: false
         archiveType: 'zip'
-        archiveFile: '$(Build.ArtifactStagingDirectory)/Dfe.FE.Interventions.Api.$(Build.BuildId).zip'
+        archiveFile: '$(Build.ArtifactStagingDirectory)/Dfe.FE.Interventions.Api.$(Build.BuildId)/Dfe.FE.Interventions.Api.$(Build.BuildId).zip'
         replaceExistingArchive: true
   
     - task: PublishBuildArtifacts@1
       displayName: 'Publish API Artifact'
       inputs:
-        PathtoPublish: '$(build.artifactstagingdirectory)'
+        PathtoPublish: '$(build.artifactstagingdirectory)/Dfe.FE.Interventions.Api.$(Build.BuildId)'
         
 - job: Database
   workspace:
