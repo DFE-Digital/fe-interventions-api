@@ -10,6 +10,8 @@ namespace Dfe.FE.Interventions.Application.FeProviders
     {
         Task<PagedSearchResult<FeProviderSynopsis>> SearchAsync(int? ukprn, string legalName, int pageNumber, CancellationToken cancellationToken);
         Task<FeProvider> RetrieveAsync(int ukprn, CancellationToken cancellationToken);
+
+        Task UpsertProvider(FeProvider provider, CancellationToken cancellationToken);
     }
 
     public class FeProviderManager : IFeProviderManager
@@ -56,6 +58,10 @@ namespace Dfe.FE.Interventions.Application.FeProviders
 
             var provider = await _feProviderRepository.RetrieveProviderAsync(ukprn, cancellationToken);
             return provider;
+        }
+
+        public async Task UpsertProvider(FeProvider provider, CancellationToken cancellationToken)
+        {
         }
     }
 }

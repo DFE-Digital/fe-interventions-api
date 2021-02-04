@@ -1,0 +1,10 @@
+﻿{
+  "profiles": {
+    "Dfe.FE.Interventions.Consumer.Ukrlp": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}
