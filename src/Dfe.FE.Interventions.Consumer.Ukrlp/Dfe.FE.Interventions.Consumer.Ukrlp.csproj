@@ -17,4 +17,13 @@
       <ProjectReference Include="..\Dfe.FE.Interventions.Data\Dfe.FE.Interventions.Data.csproj" />
       <ProjectReference Include="..\Dfe.FE.Interventions.Domain\Dfe.FE.Interventions.Domain.csproj" />
     </ItemGroup>
+
+    <ItemGroup>
+        <None Update="run.cmd">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="settings.job">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
 </Project>
