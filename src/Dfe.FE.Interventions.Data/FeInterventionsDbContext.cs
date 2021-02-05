@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Dfe.FE.Interventions.Data.Configuration;
 using Dfe.FE.Interventions.Domain.Configuration;
 using Dfe.FE.Interventions.Domain.FeProviders;
@@ -11,6 +13,8 @@ namespace Dfe.FE.Interventions.Data
     public interface IFeInterventionsDbContext
     {
         DbSet<FeProvider> FeProviders { get; }
+
+        Task<int> CommitAsync(CancellationToken cancellationToken);
     }
     
     public class FeInterventionsDbContext : DbContext, IFeInterventionsDbContext
@@ -26,6 +30,11 @@ namespace Dfe.FE.Interventions.Data
         }
         
         public DbSet<FeProvider> FeProviders { get; set; }
+
+        public async Task<int> CommitAsync(CancellationToken cancellationToken)
+        {
+            return await SaveChangesAsync(cancellationToken);
+        }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

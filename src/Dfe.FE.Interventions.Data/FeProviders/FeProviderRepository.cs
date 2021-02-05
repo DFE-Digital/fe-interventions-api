@@ -69,5 +69,28 @@ namespace Dfe.FE.Interventions.Data.FeProviders
                 .SingleOrDefaultAsync(cancellationToken);
             return record;
         }
+
+        public async Task<bool> UpsertProviderAsync(FeProvider provider, CancellationToken cancellationToken)
+        {
+            bool created;
+            
+            var existingProvider = await _dbContext.FeProviders
+                .Where(x => x.Ukprn == provider.Ukprn)
+                .SingleOrDefaultAsync(cancellationToken);
+            if (existingProvider == null)
+            {
+                
+                _dbContext.FeProviders.Add(provider);
+                created = true;
+            }
+            else
+            {
+                existingProvider.UpdateFrom(provider);
+                created = false;
+            }
+            
+            await _dbContext.CommitAsync(cancellationToken);
+            return created;
+        }
     }
 }

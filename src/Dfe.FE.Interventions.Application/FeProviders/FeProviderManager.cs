@@ -10,6 +10,8 @@ namespace Dfe.FE.Interventions.Application.FeProviders
     {
         Task<PagedSearchResult<FeProviderSynopsis>> SearchAsync(int? ukprn, string legalName, int pageNumber, CancellationToken cancellationToken);
         Task<FeProvider> RetrieveAsync(int ukprn, CancellationToken cancellationToken);
+
+        Task UpsertProvider(FeProvider provider, CancellationToken cancellationToken);
     }
 
     public class FeProviderManager : IFeProviderManager
@@ -56,6 +58,18 @@ namespace Dfe.FE.Interventions.Application.FeProviders
 
             var provider = await _feProviderRepository.RetrieveProviderAsync(ukprn, cancellationToken);
             return provider;
+        }
+
+        public async Task UpsertProvider(FeProvider provider, CancellationToken cancellationToken)
+        {
+            if (provider.Ukprn < 10000000 || provider.Ukprn > 99999999)
+            {
+                throw new InvalidRequestException("UKPRN must be an 8 digit number");
+            }
+            
+            var created = await _feProviderRepository.UpsertProviderAsync(provider, cancellationToken);
+            _logger.LogInformation("Upsert provider {UKPRN} resulted in the provider being {UpsertAction}",
+                provider.Ukprn, created ? "CREATED" : "UPDATED");
         }
     }
 }
