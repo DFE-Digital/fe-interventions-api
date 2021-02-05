@@ -9,5 +9,7 @@ namespace Dfe.FE.Interventions.Domain.FeProviders
             int pageNumber, int pageSize, CancellationToken cancellationToken);
 
         Task<FeProvider> RetrieveProviderAsync(int ukprn, CancellationToken cancellationToken);
+
+        Task<bool> UpsertProviderAsync(FeProvider provider, CancellationToken cancellationToken);
     }
 }

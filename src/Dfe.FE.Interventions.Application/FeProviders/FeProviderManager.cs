@@ -62,6 +62,14 @@ namespace Dfe.FE.Interventions.Application.FeProviders
 
         public async Task UpsertProvider(FeProvider provider, CancellationToken cancellationToken)
         {
+            if (provider.Ukprn < 10000000 || provider.Ukprn > 99999999)
+            {
+                throw new InvalidRequestException("UKPRN must be an 8 digit number");
+            }
+            
+            var created = await _feProviderRepository.UpsertProviderAsync(provider, cancellationToken);
+            _logger.LogInformation("Upsert provider {UKPRN} resulted in the provider being {UpsertAction}",
+                provider.Ukprn, created ? "CREATED" : "UPDATED");
         }
     }
 }
