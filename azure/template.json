@@ -239,7 +239,7 @@
             },
             {
               "Name": "DataServicesPlatform__KafkaBrokers",
-              "Value": "[parameters('KafkaBrokers')]"
+              "Value": "[parameters('kafkaBrokerServers')]"
             },
             {
               "Name": "DataServicesPlatform__UkrlpTopicName",
