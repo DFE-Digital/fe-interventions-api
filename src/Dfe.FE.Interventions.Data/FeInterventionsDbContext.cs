@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Dfe.FE.Interventions.Data.Configuration;
 using Dfe.FE.Interventions.Domain.Configuration;
 using Dfe.FE.Interventions.Domain.FeProviders;
+using Dfe.FE.Interventions.Domain.Learners;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -13,6 +14,7 @@ namespace Dfe.FE.Interventions.Data
     public interface IFeInterventionsDbContext
     {
         DbSet<FeProvider> FeProviders { get; }
+        DbSet<Learner> Learners { get; }
 
         Task<int> CommitAsync(CancellationToken cancellationToken);
     }
@@ -30,6 +32,7 @@ namespace Dfe.FE.Interventions.Data
         }
         
         public DbSet<FeProvider> FeProviders { get; set; }
+        public DbSet<Learner> Learners { get; set; }
 
         public async Task<int> CommitAsync(CancellationToken cancellationToken)
         {
