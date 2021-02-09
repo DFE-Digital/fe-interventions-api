@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -32,7 +33,7 @@ namespace Dfe.FE.Interventions.Data.UnitTests.LearningDeliveriesTests.LearningDe
         }
 
         [Test, AutoData]
-        public async Task ThenItShouldDeleteLearningDeliveriesForLearner(int learnerId)
+        public async Task ThenItShouldDeleteLearningDeliveriesForLearner(Guid learnerId)
         {
             var cancellationToken = new CancellationToken();
 
@@ -53,7 +54,7 @@ namespace Dfe.FE.Interventions.Data.UnitTests.LearningDeliveriesTests.LearningDe
                 .Returns(mockDbSet.Object);
             var cancellationToken = new CancellationToken();
 
-            await _repository.ReplaceAllLearningDeliveriesForLearnerAsync(123, deliveries, cancellationToken);
+            await _repository.ReplaceAllLearningDeliveriesForLearnerAsync(Guid.NewGuid(), deliveries, cancellationToken);
             
             mockDbSet.Verify(dbSet =>dbSet.AddRangeAsync(deliveries, cancellationToken),
                 Times.Once);
@@ -64,7 +65,7 @@ namespace Dfe.FE.Interventions.Data.UnitTests.LearningDeliveriesTests.LearningDe
         {
             var cancellationToken = new CancellationToken();
             
-            await _repository.ReplaceAllLearningDeliveriesForLearnerAsync(123, new LearningDelivery[0], cancellationToken);
+            await _repository.ReplaceAllLearningDeliveriesForLearnerAsync(Guid.NewGuid(), new LearningDelivery[0], cancellationToken);
             
             _dbContext.Verify(context => context.CommitAsync(cancellationToken), Times.Once);
         }

@@ -16,7 +16,12 @@ namespace Dfe.FE.Interventions.Data.Learners
         {
             _dbContext = dbContext;
         }
-        
+
+        public async Task<Learner> GetAsync(Guid id, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<UpsertResult<Guid>> UpsertLearnerAsync(Learner learner, CancellationToken cancellationToken)
         {
             bool created;

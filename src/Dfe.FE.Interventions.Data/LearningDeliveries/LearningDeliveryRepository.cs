@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,7 +15,7 @@ namespace Dfe.FE.Interventions.Data.LearningDeliveries
             _dbContext = dbContext;
         }
 
-        public async Task ReplaceAllLearningDeliveriesForLearnerAsync(int learnerId, IEnumerable<LearningDelivery> learningDeliveries, CancellationToken cancellationToken)
+        public async Task ReplaceAllLearningDeliveriesForLearnerAsync(Guid learnerId, IEnumerable<LearningDelivery> learningDeliveries, CancellationToken cancellationToken)
         {
             // Done this as the OTB EF method to delete by anything other than PK would be slow.
             // If moving away from SQL Server, then should look at a more generic way of doing this

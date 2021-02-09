@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 
-namespace Dfe.FE.Interventions.Application.UnitTests.FeProvidersTests.LearnerManagerTests
+namespace Dfe.FE.Interventions.Application.UnitTests.LearnersTests.LearnerManagerTests
 {
     public class WhenUpsertingALearner
     {
