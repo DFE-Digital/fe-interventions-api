@@ -1,6 +1,8 @@
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Dfe.FE.Interventions.Domain;
 using Dfe.FE.Interventions.Domain.Learners;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,9 +17,10 @@ namespace Dfe.FE.Interventions.Data.Learners
             _dbContext = dbContext;
         }
         
-        public async Task<bool> UpsertLearnerAsync(Learner learner, CancellationToken cancellationToken)
+        public async Task<UpsertResult<Guid>> UpsertLearnerAsync(Learner learner, CancellationToken cancellationToken)
         {
             bool created;
+            Guid key;
             
             var existingLearner = await _dbContext.Learners
                 .Where(x => x.Ukprn == learner.Ukprn &&
@@ -25,17 +28,30 @@ namespace Dfe.FE.Interventions.Data.Learners
                 .SingleOrDefaultAsync(cancellationToken);
             if (existingLearner == null)
             {
+                if (learner.Id == Guid.Empty)
+                {
+                    learner.Id = new Guid();
+                }
+
                 _dbContext.Learners.Add(learner);
+                
+                key = learner.Id;
                 created = true;
             }
             else
             {
                 existingLearner.UpdateFrom(learner);
+                
+                key = existingLearner.Id;
                 created = false;
             }
             
             await _dbContext.CommitAsync(cancellationToken);
-            return created;
+            return new UpsertResult<Guid>
+            {
+                Created = created,
+                Key = key,
+            };
         }
     }
 }

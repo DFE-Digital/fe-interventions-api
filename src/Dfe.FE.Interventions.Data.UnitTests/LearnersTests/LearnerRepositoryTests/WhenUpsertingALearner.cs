@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -40,9 +41,11 @@ namespace Dfe.FE.Interventions.Data.UnitTests.LearnersTests.LearnerRepositoryTes
                 .Returns(mockDbSet.Object);
             var cancellationToken = new CancellationToken();
 
-            var created = await _repository.UpsertLearnerAsync(learner, cancellationToken);
+            var upsertResult = await _repository.UpsertLearnerAsync(learner, cancellationToken);
 
-            Assert.IsTrue(created);
+            Assert.IsNotNull(upsertResult);
+            Assert.IsTrue(upsertResult.Created);
+            Assert.AreNotEqual(Guid.Empty, upsertResult.Key);
             mockDbSet.Verify(dbSet => dbSet.Add(learner), Times.Once);
             _dbContext.Verify(context => context.CommitAsync(cancellationToken), Times.Once);
         }
@@ -58,9 +61,11 @@ namespace Dfe.FE.Interventions.Data.UnitTests.LearnersTests.LearnerRepositoryTes
                 .Returns(mockDbSet.Object);
             var cancellationToken = new CancellationToken();
 
-            var created = await _repository.UpsertLearnerAsync(updatedLearner, cancellationToken);
+            var upsertResult = await _repository.UpsertLearnerAsync(updatedLearner, cancellationToken);
 
-            Assert.IsFalse(created);
+            Assert.IsNotNull(upsertResult);
+            Assert.IsFalse(upsertResult.Created);
+            Assert.AreEqual(existingLearner.Id, upsertResult.Key);
             Assert.AreEqual(updatedLearner.Uln, existingLearner.Uln);
             Assert.AreEqual(updatedLearner.FirstNames, existingLearner.FirstNames);
             Assert.AreEqual(updatedLearner.LastName, existingLearner.LastName);

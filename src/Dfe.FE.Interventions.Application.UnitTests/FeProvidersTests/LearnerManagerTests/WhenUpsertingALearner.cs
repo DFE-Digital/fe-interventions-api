@@ -1,6 +1,8 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Dfe.FE.Interventions.Application.Learners;
+using Dfe.FE.Interventions.Domain;
 using Dfe.FE.Interventions.Domain.FeProviders;
 using Dfe.FE.Interventions.Domain.Learners;
 using Microsoft.Extensions.Logging;
@@ -20,6 +22,8 @@ namespace Dfe.FE.Interventions.Application.UnitTests.FeProvidersTests.LearnerMan
         public void Arrange()
         {
             _learnerRepositoryMock = new Mock<ILearnerRepository>();
+            _learnerRepositoryMock.Setup(repo => repo.UpsertLearnerAsync(It.IsAny<Learner>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new UpsertResult<Guid>());
 
             _providerRepositoryMock = new Mock<IFeProviderRepository>();
             _providerRepositoryMock.Setup(repo => repo.RetrieveProviderAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))

@@ -1,3 +1,4 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Dfe.FE.Interventions.Domain.FeProviders;
@@ -6,7 +7,12 @@ using Microsoft.Extensions.Logging;
 
 namespace Dfe.FE.Interventions.Application.Learners
 {
-    public class LearnerManager
+    public interface ILearnerManager
+    {
+        Task<Guid> UpsertLearner(Learner learner, CancellationToken cancellationToken);
+    }
+
+    public class LearnerManager : ILearnerManager
     {
         private readonly ILearnerRepository _learnerRepository;
         private readonly IFeProviderRepository _providerRepository;
@@ -22,7 +28,7 @@ namespace Dfe.FE.Interventions.Application.Learners
             _logger = logger;
         }
 
-        public async Task UpsertLearner(Learner learner, CancellationToken cancellationToken)
+        public async Task<Guid> UpsertLearner(Learner learner, CancellationToken cancellationToken)
         {
             if (string.IsNullOrEmpty(learner.LearnRefNumber))
             {
@@ -35,9 +41,10 @@ namespace Dfe.FE.Interventions.Application.Learners
                 throw new InvalidRequestException($"Cannot find provider with UKPRN {learner.Ukprn}");
             }
 
-            var created = await _learnerRepository.UpsertLearnerAsync(learner, cancellationToken);
-            _logger.LogInformation("Upsert learner {UKPRN} / {LearnRefNumber} resulted in the learner being {UpsertAction}",
-                learner.Ukprn, learner.LearnRefNumber, created ? "CREATED" : "UPDATED");
+            var upsertResult = await _learnerRepository.UpsertLearnerAsync(learner, cancellationToken);
+            _logger.LogInformation("Upsert learner {UKPRN} / {LearnRefNumber} resulted in the learner being {UpsertAction}, id: {LearnerId}",
+                learner.Ukprn, learner.LearnRefNumber, upsertResult.Created ? "CREATED" : "UPDATED", upsertResult.Key);
+            return upsertResult.Key;
         }
     }
 }
