@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Dfe.FE.Interventions.Data.Configuration;
@@ -59,6 +59,7 @@ namespace Dfe.FE.Interventions.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfiguration(new FeProviderConfiguration());
+            modelBuilder.ApplyConfiguration(new LearnerConfiguration());
         }
     }
 }
