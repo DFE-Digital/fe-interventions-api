@@ -53,6 +53,16 @@ jobs:
         zipAfterPublish: false
         modifyOutputPath: false
 
+    - task: DotNetCoreCLI@2
+      displayName: 'Publish Sld Consumer'
+      inputs:
+        command: publish
+        publishWebProjects: false
+        projects: 'src/Dfe.FE.Interventions.Consumer.Sld/Dfe.FE.Interventions.Consumer.Sld.csproj'
+        arguments: '--configuration $(buildConfiguration) --self-contained --output $(Build.ArtifactStagingDirectory)/publish/App_Data/jobs/continuous/SldConsumer --no-restore --no-build'
+        zipAfterPublish: false
+        modifyOutputPath: false
+
     - task: ArchiveFiles@2
       displayName: 'Zip App'
       inputs:
