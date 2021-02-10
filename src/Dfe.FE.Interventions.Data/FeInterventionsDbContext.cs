@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Dfe.FE.Interventions.Data.Configuration;
 using Dfe.FE.Interventions.Domain.Configuration;
 using Dfe.FE.Interventions.Domain.FeProviders;
+using Dfe.FE.Interventions.Domain.Learners;
+using Dfe.FE.Interventions.Domain.LearningDeliveries;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -13,8 +16,11 @@ namespace Dfe.FE.Interventions.Data
     public interface IFeInterventionsDbContext
     {
         DbSet<FeProvider> FeProviders { get; }
+        DbSet<Learner> Learners { get; }
+        DbSet<LearningDelivery> LearningDeliveries { get; }
 
         Task<int> CommitAsync(CancellationToken cancellationToken);
+        Task<int> ExecuteSqlAsync(string sql, IEnumerable<object> parameters, CancellationToken cancellationToken);
     }
     
     public class FeInterventionsDbContext : DbContext, IFeInterventionsDbContext
@@ -30,6 +36,13 @@ namespace Dfe.FE.Interventions.Data
         }
         
         public DbSet<FeProvider> FeProviders { get; set; }
+        public DbSet<Learner> Learners { get; set; }
+        public DbSet<LearningDelivery> LearningDeliveries { get; set; }
+
+        public async Task<int> ExecuteSqlAsync(string sql, IEnumerable<object> parameters, CancellationToken cancellationToken)
+        {
+            return await Database.ExecuteSqlRawAsync(sql, parameters, cancellationToken);
+        }
 
         public async Task<int> CommitAsync(CancellationToken cancellationToken)
         {
@@ -56,6 +69,8 @@ namespace Dfe.FE.Interventions.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfiguration(new FeProviderConfiguration());
+            modelBuilder.ApplyConfiguration(new LearnerConfiguration());
+            modelBuilder.ApplyConfiguration(new LearningDeliveryConfiguration());
         }
     }
 }
