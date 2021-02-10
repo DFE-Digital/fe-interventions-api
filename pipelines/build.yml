@@ -58,7 +58,7 @@ jobs:
       inputs:
         command: publish
         publishWebProjects: false
-        projects: 'src/Dfe.FE.Interventions.Consumer.Sld/Dfe.FE.Interventions.Consumer.Sld.csproj'
+        projects: 'src/Dfe.FE.Interventions.Consumer.SubmitLearnerData/Dfe.FE.Interventions.Consumer.SubmitLearnerData.csproj'
         arguments: '--configuration $(buildConfiguration) --self-contained --output $(Build.ArtifactStagingDirectory)/publish/App_Data/jobs/continuous/SldConsumer --no-restore --no-build'
         zipAfterPublish: false
         modifyOutputPath: false
