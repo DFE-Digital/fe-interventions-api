@@ -37,6 +37,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dfe.FE.Interventions.Consum
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dfe.FE.Interventions.Consumer.SubmitLearnerData.UnitTests", "Dfe.FE.Interventions.Consumer.SubmitLearnerData.UnitTests\Dfe.FE.Interventions.Consumer.SubmitLearnerData.UnitTests.csproj", "{48180D7E-F3EE-4803-BFEE-FD9F04750674}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dfe.FE.Interventions.Infrastructure.PostcodesIo", "Dfe.FE.Interventions.Infrastructure.PostcodesIo\Dfe.FE.Interventions.Infrastructure.PostcodesIo.csproj", "{5C8365CF-D824-4AAE-85B9-EB2CCE5A8AF3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -87,6 +89,10 @@ Global
 		{48180D7E-F3EE-4803-BFEE-FD9F04750674}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{48180D7E-F3EE-4803-BFEE-FD9F04750674}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{48180D7E-F3EE-4803-BFEE-FD9F04750674}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5C8365CF-D824-4AAE-85B9-EB2CCE5A8AF3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C8365CF-D824-4AAE-85B9-EB2CCE5A8AF3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C8365CF-D824-4AAE-85B9-EB2CCE5A8AF3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C8365CF-D824-4AAE-85B9-EB2CCE5A8AF3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{E384C7D9-7080-4C87-9A82-B337DE8C189F} = {F5EACB08-4517-48DF-A0BE-5795580E295D}

@@ -12,4 +12,5 @@ CREATE TABLE [dbo].[FeProvider]
   [LegalAddressTown] NVARCHAR(255),
   [LegalAddressCounty] NVARCHAR(255),
   [LegalAddressPostcode] NVARCHAR(255),
+  [LegalAddressRegion] NVARCHAR(255),
 )
