@@ -11,5 +11,6 @@
         public string LegalAddressTown { get; set; }
         public string LegalAddressCounty { get; set; }
         public string LegalAddressPostcode { get; set; }
+        public string LegalAddressRegion { get; set; }
     }
 }

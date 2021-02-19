@@ -7,6 +7,7 @@
     <ItemGroup>
       <ProjectReference Include="..\Dfe.FE.Interventions.Application\Dfe.FE.Interventions.Application.csproj" />
       <ProjectReference Include="..\Dfe.FE.Interventions.Data\Dfe.FE.Interventions.Data.csproj" />
+      <ProjectReference Include="..\Dfe.FE.Interventions.Infrastructure.PostcodesIo\Dfe.FE.Interventions.Infrastructure.PostcodesIo.csproj" />
     </ItemGroup>
 
     <ItemGroup>

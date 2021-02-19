@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Dfe.FE.Interventions.Domain;
 using Dfe.FE.Interventions.Domain.FeProviders;
+using Dfe.FE.Interventions.Domain.Locations;
 using Microsoft.Extensions.Logging;
 
 namespace Dfe.FE.Interventions.Application.FeProviders
@@ -17,13 +18,16 @@ namespace Dfe.FE.Interventions.Application.FeProviders
     public class FeProviderManager : IFeProviderManager
     {
         private readonly IFeProviderRepository _feProviderRepository;
+        private readonly ILocationService _locationService;
         private readonly ILogger<FeProviderManager> _logger;
 
         public FeProviderManager(
             IFeProviderRepository feProviderRepository,
+            ILocationService locationService,
             ILogger<FeProviderManager> logger)
         {
             _feProviderRepository = feProviderRepository;
+            _locationService = locationService;
             _logger = logger;
         }
 
@@ -45,7 +49,7 @@ namespace Dfe.FE.Interventions.Application.FeProviders
                 throw new InvalidRequestException("Page number exceeds available pages. " +
                                                   $"Requested page {pageNumber}, but only {result.TotalNumberOfPages} pages available");
             }
-            
+
             return result;
         }
 
@@ -66,7 +70,17 @@ namespace Dfe.FE.Interventions.Application.FeProviders
             {
                 throw new InvalidRequestException("UKPRN must be an 8 digit number");
             }
-            
+
+            var location = !string.IsNullOrEmpty(provider.LegalAddressPostcode)
+                ? await _locationService.GetByPostcodeAsync(provider.LegalAddressPostcode, cancellationToken)
+                : null;
+            if (location != null)
+            {
+                _logger.LogInformation("Setting region for provider {UKPRN} to {Region} based on postcode {Postcode}",
+                    provider.Ukprn, location.Region, provider.LegalAddressPostcode);
+                provider.LegalAddressRegion = location.Region;
+            }
+
             var created = await _feProviderRepository.UpsertProviderAsync(provider, cancellationToken);
             _logger.LogInformation("Upsert provider {UKPRN} resulted in the provider being {UpsertAction}",
                 provider.Ukprn, created ? "CREATED" : "UPDATED");
