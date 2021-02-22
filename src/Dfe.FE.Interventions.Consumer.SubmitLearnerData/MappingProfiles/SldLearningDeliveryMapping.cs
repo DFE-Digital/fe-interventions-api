@@ -16,7 +16,8 @@ namespace Dfe.FE.Interventions.Consumer.SubmitLearnerData.MappingProfiles
                 .ForMember(src => src.CompletionStatus, opts => opts.MapFrom(dst => dst.CompStatus))
                 .ForMember(src => src.OutcomeGrade, opts => opts.MapFrom(dst => dst.OutGrade))
                 .ForMember(src => src.WithdrawalReason, opts => opts.MapFrom(dst => dst.WithdrawReason))
-                .ForMember(src => src.DeliveryLocationPostcode, opts => opts.MapFrom(dst => dst.DelLocPostCode));
+                .ForMember(src => src.DeliveryLocationPostcode, opts => opts.MapFrom(dst => dst.DelLocPostCode))
+                .ForMember(src => src.ProgrammeType, opts => opts.MapFrom(dst => dst.ProgType));
         }
     }
 }
