@@ -126,6 +126,16 @@ namespace Dfe.FE.Interventions.Consumer.SubmitLearnerData.UnitTests.MappingProfi
             Assert.AreEqual(provider.DelLocPostCode, actual.DeliveryLocationPostcode);
         }
 
+        [Test]
+        public void ThenItShouldMapProgrammeTypeFromProgType()
+        {
+            var provider = MakeLearningDelivery();
+
+            var actual = _mapper.Map<Domain.LearningDeliveries.LearningDelivery>(provider);
+
+            Assert.AreEqual(provider.ProgType, actual.ProgrammeType);
+        }
+
         private Sld.LearningDelivery MakeLearningDelivery()
         {
             var random = new Random();
