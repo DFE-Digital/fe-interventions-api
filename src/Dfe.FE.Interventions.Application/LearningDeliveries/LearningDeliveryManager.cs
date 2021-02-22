@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Dfe.FE.Interventions.Domain;
 using Dfe.FE.Interventions.Domain.Learners;
 using Dfe.FE.Interventions.Domain.LearningDeliveries;
 using Microsoft.Extensions.Logging;
@@ -9,6 +10,7 @@ namespace Dfe.FE.Interventions.Application.LearningDeliveries
 {
     public interface ILearningDeliveryManager
     {
+        Task<PagedSearchResult<LearningDeliverySynopsis>> ListForProviderAsync(int ukprn, int pageNumber, CancellationToken cancellationToken);
         Task UpdateLearnersLearningDeliveriesAsync(LearningDelivery[] learningDeliveries, CancellationToken cancellationToken);
     }
 
@@ -26,6 +28,28 @@ namespace Dfe.FE.Interventions.Application.LearningDeliveries
             _learningDeliveryRepository = learningDeliveryRepository;
             _learnerRepository = learnerRepository;
             _logger = logger;
+        }
+
+        public async Task<PagedSearchResult<LearningDeliverySynopsis>> ListForProviderAsync(int ukprn, int pageNumber, CancellationToken cancellationToken)
+        {
+            if (ukprn < 10000000 || ukprn > 99999999)
+            {
+                throw new InvalidRequestException("UKPRN must be an 8 digit number");
+            }
+
+            if (pageNumber < 1)
+            {
+                throw new InvalidRequestException("Page must be a number greater than 0");
+            }
+            
+            var result = await _learningDeliveryRepository.ListForProviderAsync(ukprn, pageNumber, PaginationConstants.PageSize, cancellationToken);
+            if (pageNumber > result.TotalNumberOfPages)
+            {
+                throw new InvalidRequestException("Page number exceeds available pages. " +
+                                                  $"Requested page {pageNumber}, but only {result.TotalNumberOfPages} pages available");
+            }
+            
+            return result;
         }
 
         public async Task UpdateLearnersLearningDeliveriesAsync(LearningDelivery[] learningDeliveries, CancellationToken cancellationToken)
