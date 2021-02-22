@@ -7,6 +7,7 @@ namespace Dfe.FE.Interventions.Domain.LearningDeliveries
 {
     public interface ILearningDeliveryRepository
     {
+        Task<PagedSearchResult<LearningDeliverySynopsis>> ListForProviderAsync(int ukprn, int pageNumber, int pageSize, CancellationToken cancellationToken);
         Task ReplaceAllLearningDeliveriesForLearnerAsync(Guid learnerId, IEnumerable<LearningDelivery> learningDeliveries, CancellationToken cancellationToken);
     }
 }
