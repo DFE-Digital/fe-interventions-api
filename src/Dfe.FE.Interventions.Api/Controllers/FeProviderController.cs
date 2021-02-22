@@ -39,7 +39,7 @@ namespace Dfe.FE.Interventions.Api.Controllers
         {
             // Parse UKPRN
             int? parsedUkprn = null;
-            if (!string.IsNullOrEmpty(ukprn) && !TryParseNullableInt(ukprn, out parsedUkprn))
+            if (!string.IsNullOrEmpty(ukprn) && !ukprn.TryParseAsNullableInt(out parsedUkprn))
             {
                 return BadRequest(new ProblemDetails
                 {
@@ -132,18 +132,6 @@ namespace Dfe.FE.Interventions.Api.Controllers
             };
 
             return Ok(response);
-        }
-
-        private static bool TryParseNullableInt(string value, out int? parsed)
-        {
-            if (!int.TryParse(value, out var temp))
-            {
-                parsed = null;
-                return false;
-            }
-
-            parsed = temp;
-            return true;
         }
     }
 }
