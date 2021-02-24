@@ -76,19 +76,20 @@ namespace Dfe.FE.Interventions.Application.FeProviders
                 throw new InvalidRequestException("UKPRN must be an 8 digit number");
             }
 
-            var numberOfApprenticeshipLearners = _learnerRepository.GetCountOfContinuingLearnersAtProviderWithFundingModelsAsync(
+            // Could probably run these concurrently, but need to make changes to how we get context
+            var numberOfApprenticeshipLearners = await _learnerRepository.GetCountOfContinuingLearnersAtProviderWithFundingModelsAsync(
                 ukprn,
                 new[] {36},
                 cancellationToken);
-
-            await Task.WhenAll(new[]
-            {
-                numberOfApprenticeshipLearners,
-            });
+            var numberOfLearners16To19 = await _learnerRepository.GetCountOfContinuingLearnersAtProviderWithFundingModelsAsync(
+                ukprn,
+                new[] {25, 82},
+                cancellationToken);
 
             return new FeProviderStatistics
             {
-                NumberOfApprenticeshipLearners = numberOfApprenticeshipLearners.Result,
+                NumberOfApprenticeshipLearners = numberOfApprenticeshipLearners,
+                NumberOfLearners16To19 = numberOfLearners16To19,
             };
         }
 
