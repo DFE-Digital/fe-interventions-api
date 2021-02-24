@@ -1,6 +1,5 @@
 using System.Threading;
 using System.Threading.Tasks;
-using AutoFixture.NUnit3;
 using Dfe.FE.Interventions.Application.FeProviders;
 using Dfe.FE.Interventions.Domain.FeProviders;
 using Dfe.FE.Interventions.Domain.Learners;
@@ -11,7 +10,7 @@ using NUnit.Framework;
 
 namespace Dfe.FE.Interventions.Application.UnitTests.FeProvidersTests.FeProviderManagerTests
 {
-    public class WhenUpsertingAProvider
+    public class WhenRetrievingStatistics
     {
         private Mock<IFeProviderRepository> _feProviderRepositoryMock;
         private Mock<ILearnerRepository> _learnerRepositoryMock;
@@ -25,6 +24,9 @@ namespace Dfe.FE.Interventions.Application.UnitTests.FeProvidersTests.FeProvider
             _feProviderRepositoryMock = new Mock<IFeProviderRepository>();
 
             _learnerRepositoryMock = new Mock<ILearnerRepository>();
+            _learnerRepositoryMock.Setup(repo =>
+                    repo.GetCountOfContinuingLearnersAtProviderWithFundingModelAsync(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(123);
 
             _locationServiceMock = new Mock<ILocationService>();
 
@@ -38,17 +40,30 @@ namespace Dfe.FE.Interventions.Application.UnitTests.FeProvidersTests.FeProvider
         }
 
         [Test]
-        public async Task ThenItShouldUpsertProviderInRepository()
+        public async Task ThenItShouldReturnAnFeProviderStatisticsObject()
         {
+            var ukprn = 12345678;
+
+            var actual = await _manager.RetrieveStatisticsAsync(ukprn, CancellationToken.None);
+
+            Assert.IsNotNull(actual);
+        }
+
+        [Test]
+        public async Task ThenItShouldPopulateNumberOfApprenticeshipLearnersFromLearnerRepoWithFundingModel36()
+        {
+            var ukprn = 12345678;
+            var expected = 45;
             var cancellationToken = new CancellationToken();
-            var provider = new FeProvider
-            {
-                Ukprn = 12345678,
-            };
 
-            await _manager.UpsertProvider(provider, cancellationToken);
+            _learnerRepositoryMock.Setup(repo =>
+                    repo.GetCountOfContinuingLearnersAtProviderWithFundingModelAsync(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(expected);
 
-            _feProviderRepositoryMock.Verify(repo => repo.UpsertProviderAsync(provider, cancellationToken),
+            var actual = await _manager.RetrieveStatisticsAsync(ukprn, cancellationToken);
+
+            Assert.AreEqual(expected, actual.NumberOfApprenticeshipLearners);
+            _learnerRepositoryMock.Verify(repo => repo.GetCountOfContinuingLearnersAtProviderWithFundingModelAsync(ukprn, 36, cancellationToken),
                 Times.Once);
         }
 
@@ -56,13 +71,8 @@ namespace Dfe.FE.Interventions.Application.UnitTests.FeProvidersTests.FeProvider
         [TestCase(123456789)]
         public void AndUkprnIsNot8DigitsThenItShouldThrowAnInvalidRequestException(int ukprn)
         {
-            var provider = new FeProvider
-            {
-                Ukprn = ukprn,
-            };
-
             var actual = Assert.ThrowsAsync<InvalidRequestException>(async () =>
-                await _manager.UpsertProvider(provider, CancellationToken.None));
+                await _manager.RetrieveStatisticsAsync(ukprn,CancellationToken.None));
             Assert.AreEqual("UKPRN must be an 8 digit number", actual.Message);
         }
     }

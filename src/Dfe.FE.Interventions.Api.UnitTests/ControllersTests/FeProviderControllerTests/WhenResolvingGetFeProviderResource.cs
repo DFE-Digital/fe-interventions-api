@@ -70,6 +70,19 @@ namespace Dfe.FE.Interventions.Api.UnitTests.ControllersTests.FeProviderControll
         }
 
         [Test]
+        public async Task AndTheProviderIsNotFoundThenItShouldReturnNotFoundResult()
+        {
+            var ukprn = 12345678;
+            
+            _feProviderManagerMock.Setup(manager => manager.RetrieveAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync((FeProvider)null);
+            
+            var result = await _controller.GetAsync(ukprn.ToString(),  CancellationToken.None);
+            
+            Assert.IsInstanceOf<NotFoundResult>(result);
+        }
+
+        [Test]
         public async Task ThenItShouldMapResultsToApiFormat()
         {
             var source = new FeProvider();

@@ -58,5 +58,27 @@ namespace Dfe.FE.Interventions.Data.Learners
                 Key = key,
             };
         }
+
+        public async Task<int> GetCountOfContinuingLearnersAtProviderWithFundingModelAsync(int ukprn, int fundingModel, CancellationToken cancellationToken)
+        {
+            var query = _dbContext.Learners
+                .Join(_dbContext.LearningDeliveries,
+                    l => l.Id,
+                    ld => ld.LearnerId,
+                    (l, ld) => new
+                    {
+                        l.Id,
+                        l.Ukprn,
+                        ld.FundingModel,
+                        ld.CompletionStatus
+                    })
+                .Where(x => x.Ukprn == ukprn && x.FundingModel == fundingModel && x.CompletionStatus == 1)
+                .Select(x => x.Id)
+                .Distinct();
+
+            var countOfLearners = await query.CountAsync(cancellationToken);
+
+            return countOfLearners;
+        }
     }
 }

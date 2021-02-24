@@ -9,5 +9,7 @@ namespace Dfe.FE.Interventions.Domain.Learners
         Task<Learner> GetAsync(Guid id, CancellationToken cancellationToken);
         
         Task<UpsertResult<Guid>> UpsertLearnerAsync(Learner learner, CancellationToken cancellationToken);
+
+        Task<int> GetCountOfContinuingLearnersAtProviderWithFundingModelAsync(int ukprn, int fundingModel, CancellationToken cancellationToken);
     }
 }

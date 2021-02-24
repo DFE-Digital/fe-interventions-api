@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Dfe.FE.Interventions.Domain;
 using Dfe.FE.Interventions.Domain.FeProviders;
+using Dfe.FE.Interventions.Domain.Learners;
 using Dfe.FE.Interventions.Domain.Locations;
 using Microsoft.Extensions.Logging;
 
@@ -11,6 +12,7 @@ namespace Dfe.FE.Interventions.Application.FeProviders
     {
         Task<PagedSearchResult<FeProviderSynopsis>> SearchAsync(int? ukprn, string legalName, int pageNumber, CancellationToken cancellationToken);
         Task<FeProvider> RetrieveAsync(int ukprn, CancellationToken cancellationToken);
+        Task<FeProviderStatistics> RetrieveStatisticsAsync(int ukprn, CancellationToken cancellationToken);
 
         Task UpsertProvider(FeProvider provider, CancellationToken cancellationToken);
     }
@@ -18,15 +20,18 @@ namespace Dfe.FE.Interventions.Application.FeProviders
     public class FeProviderManager : IFeProviderManager
     {
         private readonly IFeProviderRepository _feProviderRepository;
+        private readonly ILearnerRepository _learnerRepository;
         private readonly ILocationService _locationService;
         private readonly ILogger<FeProviderManager> _logger;
 
         public FeProviderManager(
             IFeProviderRepository feProviderRepository,
+            ILearnerRepository learnerRepository,
             ILocationService locationService,
             ILogger<FeProviderManager> logger)
         {
             _feProviderRepository = feProviderRepository;
+            _learnerRepository = learnerRepository;
             _locationService = locationService;
             _logger = logger;
         }
@@ -62,6 +67,26 @@ namespace Dfe.FE.Interventions.Application.FeProviders
 
             var provider = await _feProviderRepository.RetrieveProviderAsync(ukprn, cancellationToken);
             return provider;
+        }
+
+        public async Task<FeProviderStatistics> RetrieveStatisticsAsync(int ukprn, CancellationToken cancellationToken)
+        {
+            if (ukprn < 10000000 || ukprn > 99999999)
+            {
+                throw new InvalidRequestException("UKPRN must be an 8 digit number");
+            }
+            
+            var numberOfApprenticeshipLearners = _learnerRepository.GetCountOfContinuingLearnersAtProviderWithFundingModelAsync(ukprn, 36, cancellationToken);
+
+            await Task.WhenAll(new[]
+            {
+                numberOfApprenticeshipLearners,
+            });
+
+            return new FeProviderStatistics
+            {
+                NumberOfApprenticeshipLearners = numberOfApprenticeshipLearners.Result,
+            };
         }
 
         public async Task UpsertProvider(FeProvider provider, CancellationToken cancellationToken)

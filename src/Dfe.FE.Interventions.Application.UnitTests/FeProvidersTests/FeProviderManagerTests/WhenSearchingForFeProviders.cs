@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Dfe.FE.Interventions.Application.FeProviders;
 using Dfe.FE.Interventions.Domain;
 using Dfe.FE.Interventions.Domain.FeProviders;
+using Dfe.FE.Interventions.Domain.Learners;
 using Dfe.FE.Interventions.Domain.Locations;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -13,6 +14,7 @@ namespace Dfe.FE.Interventions.Application.UnitTests.FeProvidersTests.FeProvider
     public class WhenSearchingForFeProviders
     {
         private Mock<IFeProviderRepository> _feProviderRepositoryMock;
+        private Mock<ILearnerRepository> _learnerRepositoryMock;
         private Mock<ILocationService> _locationServiceMock;
         private Mock<ILogger<FeProviderManager>> _loggerMock;
         private FeProviderManager _manager;
@@ -29,12 +31,15 @@ namespace Dfe.FE.Interventions.Application.UnitTests.FeProvidersTests.FeProvider
                     TotalNumberOfPages = int.MaxValue,
                 });
 
+            _learnerRepositoryMock = new Mock<ILearnerRepository>();
+
             _locationServiceMock = new Mock<ILocationService>();
 
             _loggerMock = new Mock<ILogger<FeProviderManager>>();
 
             _manager = new FeProviderManager(
                 _feProviderRepositoryMock.Object,
+                _learnerRepositoryMock.Object,
                 _locationServiceMock.Object,
                 _loggerMock.Object);
         }
