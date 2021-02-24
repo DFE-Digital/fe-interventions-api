@@ -85,11 +85,16 @@ namespace Dfe.FE.Interventions.Application.FeProviders
                 ukprn,
                 new[] {25, 82},
                 cancellationToken);
+            var numberOfAdultEducationLearners = await _learnerRepository.GetCountOfContinuingLearnersAtProviderWithFundingModelsAsync(
+                ukprn,
+                new[] {35, 81},
+                cancellationToken);
 
             return new FeProviderStatistics
             {
                 NumberOfApprenticeshipLearners = numberOfApprenticeshipLearners,
                 NumberOfLearners16To19 = numberOfLearners16To19,
+                NumberOfAdultEducationLearners = numberOfAdultEducationLearners,
             };
         }
 
