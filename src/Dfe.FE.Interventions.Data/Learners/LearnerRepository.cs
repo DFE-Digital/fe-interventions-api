@@ -26,7 +26,7 @@ namespace Dfe.FE.Interventions.Data.Learners
         {
             bool created;
             Guid key;
-            
+
             var existingLearner = await _dbContext.Learners
                 .Where(x => x.Ukprn == learner.Ukprn &&
                             x.LearnRefNumber == learner.LearnRefNumber)
@@ -39,18 +39,18 @@ namespace Dfe.FE.Interventions.Data.Learners
                 }
 
                 _dbContext.Learners.Add(learner);
-                
+
                 key = learner.Id;
                 created = true;
             }
             else
             {
                 existingLearner.UpdateFrom(learner);
-                
+
                 key = existingLearner.Id;
                 created = false;
             }
-            
+
             await _dbContext.CommitAsync(cancellationToken);
             return new UpsertResult<Guid>
             {
@@ -59,7 +59,7 @@ namespace Dfe.FE.Interventions.Data.Learners
             };
         }
 
-        public async Task<int> GetCountOfContinuingLearnersAtProviderWithFundingModelAsync(int ukprn, int fundingModel, CancellationToken cancellationToken)
+        public async Task<int> GetCountOfContinuingLearnersAtProviderWithFundingModelsAsync(int ukprn, int[] fundingModels, CancellationToken cancellationToken)
         {
             var query = _dbContext.Learners
                 .Join(_dbContext.LearningDeliveries,
@@ -72,7 +72,7 @@ namespace Dfe.FE.Interventions.Data.Learners
                         ld.FundingModel,
                         ld.CompletionStatus
                     })
-                .Where(x => x.Ukprn == ukprn && x.FundingModel == fundingModel && x.CompletionStatus == 1)
+                .Where(x => x.Ukprn == ukprn && x.FundingModel != null && fundingModels.Contains(x.FundingModel.Value) && x.CompletionStatus == 1)
                 .Select(x => x.Id)
                 .Distinct();
 

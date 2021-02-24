@@ -25,7 +25,7 @@ namespace Dfe.FE.Interventions.Application.UnitTests.FeProvidersTests.FeProvider
 
             _learnerRepositoryMock = new Mock<ILearnerRepository>();
             _learnerRepositoryMock.Setup(repo =>
-                    repo.GetCountOfContinuingLearnersAtProviderWithFundingModelAsync(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                    repo.GetCountOfContinuingLearnersAtProviderWithFundingModelsAsync(It.IsAny<int>(), It.IsAny<int[]>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(123);
 
             _locationServiceMock = new Mock<ILocationService>();
@@ -57,13 +57,13 @@ namespace Dfe.FE.Interventions.Application.UnitTests.FeProvidersTests.FeProvider
             var cancellationToken = new CancellationToken();
 
             _learnerRepositoryMock.Setup(repo =>
-                    repo.GetCountOfContinuingLearnersAtProviderWithFundingModelAsync(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                    repo.GetCountOfContinuingLearnersAtProviderWithFundingModelsAsync(It.IsAny<int>(), It.IsAny<int[]>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(expected);
 
             var actual = await _manager.RetrieveStatisticsAsync(ukprn, cancellationToken);
 
             Assert.AreEqual(expected, actual.NumberOfApprenticeshipLearners);
-            _learnerRepositoryMock.Verify(repo => repo.GetCountOfContinuingLearnersAtProviderWithFundingModelAsync(ukprn, 36, cancellationToken),
+            _learnerRepositoryMock.Verify(repo => repo.GetCountOfContinuingLearnersAtProviderWithFundingModelsAsync(ukprn, new[] {36}, cancellationToken),
                 Times.Once);
         }
 
@@ -72,7 +72,7 @@ namespace Dfe.FE.Interventions.Application.UnitTests.FeProvidersTests.FeProvider
         public void AndUkprnIsNot8DigitsThenItShouldThrowAnInvalidRequestException(int ukprn)
         {
             var actual = Assert.ThrowsAsync<InvalidRequestException>(async () =>
-                await _manager.RetrieveStatisticsAsync(ukprn,CancellationToken.None));
+                await _manager.RetrieveStatisticsAsync(ukprn, CancellationToken.None));
             Assert.AreEqual("UKPRN must be an 8 digit number", actual.Message);
         }
     }
