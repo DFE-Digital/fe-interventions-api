@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Dfe.FE.Interventions.Application.FeProviders;
 using Dfe.FE.Interventions.Domain.FeProviders;
 using Dfe.FE.Interventions.Domain.Learners;
+using Dfe.FE.Interventions.Domain.LearningDeliveries;
 using Dfe.FE.Interventions.Domain.Locations;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -14,6 +15,7 @@ namespace Dfe.FE.Interventions.Application.UnitTests.FeProvidersTests.FeProvider
     {
         private Mock<IFeProviderRepository> _feProviderRepositoryMock;
         private Mock<ILearnerRepository> _learnerRepositoryMock;
+        private Mock<ILearningDeliveryRepository> _learningDeliveryRepositoryMock;
         private Mock<ILocationService> _locationServiceMock;
         private Mock<ILogger<FeProviderManager>> _loggerMock;
         private FeProviderManager _manager;
@@ -28,6 +30,10 @@ namespace Dfe.FE.Interventions.Application.UnitTests.FeProvidersTests.FeProvider
                     repo.GetCountOfContinuingLearnersAtProviderWithFundingModelsAsync(It.IsAny<int>(), It.IsAny<int[]>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(123);
 
+            _learningDeliveryRepositoryMock = new Mock<ILearningDeliveryRepository>();
+            _learningDeliveryRepositoryMock.Setup(repo => repo.GetCountOfAimTypesDeliveredByProviderAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(456);
+
             _locationServiceMock = new Mock<ILocationService>();
 
             _loggerMock = new Mock<ILogger<FeProviderManager>>();
@@ -35,6 +41,7 @@ namespace Dfe.FE.Interventions.Application.UnitTests.FeProvidersTests.FeProvider
             _manager = new FeProviderManager(
                 _feProviderRepositoryMock.Object,
                 _learnerRepositoryMock.Object,
+                _learningDeliveryRepositoryMock.Object,
                 _locationServiceMock.Object,
                 _loggerMock.Object);
         }
@@ -81,7 +88,7 @@ namespace Dfe.FE.Interventions.Application.UnitTests.FeProvidersTests.FeProvider
             var actual = await _manager.RetrieveStatisticsAsync(ukprn, cancellationToken);
 
             Assert.AreEqual(expected, actual.NumberOfLearners16To19);
-            _learnerRepositoryMock.Verify(repo => repo.GetCountOfContinuingLearnersAtProviderWithFundingModelsAsync(ukprn, new[] {25,82}, cancellationToken),
+            _learnerRepositoryMock.Verify(repo => repo.GetCountOfContinuingLearnersAtProviderWithFundingModelsAsync(ukprn, new[] {25, 82}, cancellationToken),
                 Times.Once);
         }
 
@@ -99,7 +106,7 @@ namespace Dfe.FE.Interventions.Application.UnitTests.FeProvidersTests.FeProvider
             var actual = await _manager.RetrieveStatisticsAsync(ukprn, cancellationToken);
 
             Assert.AreEqual(expected, actual.NumberOfAdultEducationLearners);
-            _learnerRepositoryMock.Verify(repo => repo.GetCountOfContinuingLearnersAtProviderWithFundingModelsAsync(ukprn, new[] {35,81}, cancellationToken),
+            _learnerRepositoryMock.Verify(repo => repo.GetCountOfContinuingLearnersAtProviderWithFundingModelsAsync(ukprn, new[] {35, 81}, cancellationToken),
                 Times.Once);
         }
 
@@ -117,7 +124,7 @@ namespace Dfe.FE.Interventions.Application.UnitTests.FeProvidersTests.FeProvider
             var actual = await _manager.RetrieveStatisticsAsync(ukprn, cancellationToken);
 
             Assert.AreEqual(expected, actual.NumberOfOtherFundingLearners);
-            _learnerRepositoryMock.Verify(repo => repo.GetCountOfContinuingLearnersAtProviderWithFundingModelsAsync(ukprn, new[] {10,70}, cancellationToken),
+            _learnerRepositoryMock.Verify(repo => repo.GetCountOfContinuingLearnersAtProviderWithFundingModelsAsync(ukprn, new[] {10, 70}, cancellationToken),
                 Times.Once);
         }
 
@@ -172,6 +179,24 @@ namespace Dfe.FE.Interventions.Application.UnitTests.FeProvidersTests.FeProvider
 
             Assert.AreEqual(expected, actual.NumberOfLearnersOnABreak);
             _learnerRepositoryMock.Verify(repo => repo.GetCountOfLearnersOnABreakAtProviderAsync(ukprn, cancellationToken),
+                Times.Once);
+        }
+
+        [Test]
+        public async Task ThenItShouldPopulateNumberOfAimTypesFromLearningDeliveryRepo()
+        {
+            var ukprn = 12345678;
+            var expected = 45;
+            var cancellationToken = new CancellationToken();
+
+            _learningDeliveryRepositoryMock.Setup(repo =>
+                    repo.GetCountOfAimTypesDeliveredByProviderAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(expected);
+
+            var actual = await _manager.RetrieveStatisticsAsync(ukprn, cancellationToken);
+
+            Assert.AreEqual(expected, actual.NumberOfAimTypes);
+            _learningDeliveryRepositoryMock.Verify(repo => repo.GetCountOfAimTypesDeliveredByProviderAsync(ukprn, cancellationToken),
                 Times.Once);
         }
 

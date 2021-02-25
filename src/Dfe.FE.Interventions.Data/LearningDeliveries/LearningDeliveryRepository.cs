@@ -71,5 +71,25 @@ namespace Dfe.FE.Interventions.Data.LearningDeliveries
 
             await _dbContext.CommitAsync(cancellationToken);
         }
+
+        public async Task<int> GetCountOfAimTypesDeliveredByProviderAsync(int ukprn, CancellationToken cancellationToken)
+        {
+            var query = _dbContext.Learners
+                .Join(_dbContext.LearningDeliveries,
+                    l => l.Id,
+                    ld => ld.LearnerId,
+                    (l, ld) => new
+                    {
+                        ld.AimType,
+                        l.Ukprn,
+                    })
+                .Where(x => x.Ukprn == ukprn && x.AimType != null)
+                .Select(x => x.AimType)
+                .Distinct();
+
+            var countOfLearners = await query.CountAsync(cancellationToken);
+
+            return countOfLearners;
+        }
     }
 }

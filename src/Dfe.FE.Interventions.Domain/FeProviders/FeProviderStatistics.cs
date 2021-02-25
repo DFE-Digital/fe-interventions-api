@@ -9,5 +9,6 @@ namespace Dfe.FE.Interventions.Domain.FeProviders
         public int NumberOfOtherFundingLearners { get; set; }
         public int NumberOfNonFundedLearners { get; set; }
         public int NumberOfLearnersOnABreak { get; set; }
+        public int NumberOfAimTypes { get; set; }
     }
 }

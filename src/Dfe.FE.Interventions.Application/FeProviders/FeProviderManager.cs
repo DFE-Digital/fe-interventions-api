@@ -1,8 +1,10 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
+using Dfe.FE.Interventions.Application.LearningDeliveries;
 using Dfe.FE.Interventions.Domain;
 using Dfe.FE.Interventions.Domain.FeProviders;
 using Dfe.FE.Interventions.Domain.Learners;
+using Dfe.FE.Interventions.Domain.LearningDeliveries;
 using Dfe.FE.Interventions.Domain.Locations;
 using Microsoft.Extensions.Logging;
 
@@ -21,17 +23,20 @@ namespace Dfe.FE.Interventions.Application.FeProviders
     {
         private readonly IFeProviderRepository _feProviderRepository;
         private readonly ILearnerRepository _learnerRepository;
+        private readonly ILearningDeliveryRepository _learningDeliveryRepository;
         private readonly ILocationService _locationService;
         private readonly ILogger<FeProviderManager> _logger;
 
         public FeProviderManager(
             IFeProviderRepository feProviderRepository,
             ILearnerRepository learnerRepository,
+            ILearningDeliveryRepository learningDeliveryRepository,
             ILocationService locationService,
             ILogger<FeProviderManager> logger)
         {
             _feProviderRepository = feProviderRepository;
             _learnerRepository = learnerRepository;
+            _learningDeliveryRepository = learningDeliveryRepository;
             _locationService = locationService;
             _logger = logger;
         }
@@ -103,6 +108,9 @@ namespace Dfe.FE.Interventions.Application.FeProviders
             var numberOfLearnersOnABreak = await _learnerRepository.GetCountOfLearnersOnABreakAtProviderAsync(
                 ukprn,
                 cancellationToken);
+            var numberOfAimTypes = await _learningDeliveryRepository.GetCountOfAimTypesDeliveredByProviderAsync(
+                ukprn,
+                cancellationToken);
 
             return new FeProviderStatistics
             {
@@ -113,6 +121,7 @@ namespace Dfe.FE.Interventions.Application.FeProviders
                 NumberOfOtherFundingLearners = numberOfOtherFundingLearners,
                 NumberOfNonFundedLearners = numberOfNonFundedLearners,
                 NumberOfLearnersOnABreak = numberOfLearnersOnABreak,
+                NumberOfAimTypes = numberOfAimTypes,
             };
         }
 
