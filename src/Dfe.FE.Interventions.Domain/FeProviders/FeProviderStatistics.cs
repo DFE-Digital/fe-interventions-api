@@ -8,5 +8,6 @@ namespace Dfe.FE.Interventions.Domain.FeProviders
         public int NumberOfAdultEducationLearners { get; set; }
         public int NumberOfOtherFundingLearners { get; set; }
         public int NumberOfNonFundedLearners { get; set; }
+        public int NumberOfLearnersOnABreak { get; set; }
     }
 }

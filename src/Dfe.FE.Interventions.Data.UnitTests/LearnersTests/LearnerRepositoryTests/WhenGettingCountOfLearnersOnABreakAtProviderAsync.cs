@@ -12,7 +12,7 @@ using NUnit.Framework;
 
 namespace Dfe.FE.Interventions.Data.UnitTests.LearnersTests.LearnerRepositoryTests
 {
-    public class WhenGettingCountOfContinuingLearnersAtProviderWithFundingModels
+    public class WhenGettingCountOfLearnersOnABreakAtProviderAsync
     {
         private List<Learner> _learners;
         private List<LearningDelivery> _learningDeliveries;
@@ -36,7 +36,7 @@ namespace Dfe.FE.Interventions.Data.UnitTests.LearnersTests.LearnerRepositoryTes
         }
 
         [Test]
-        public async Task ThenItShouldReturnCorrectCountOfLearnersForProviderAndFundingModel()
+        public async Task ThenItShouldReturnCorrectCountOfLearnersForProvider()
         {
             var ukprn = 1234578;
             var fundingModel1 = 36;
@@ -44,21 +44,20 @@ namespace Dfe.FE.Interventions.Data.UnitTests.LearnersTests.LearnerRepositoryTes
 
             // Arrange
             _learners.Add(new Learner {Id = Guid.NewGuid(), Ukprn = ukprn});
-            _learningDeliveries.Add(new LearningDelivery {LearnerId = _learners[0].Id, FundingModel = fundingModel1, CompletionStatus = 1}); // match
-            _learningDeliveries.Add(new LearningDelivery {LearnerId = _learners[0].Id, FundingModel = fundingModel2, CompletionStatus = 1}); // match
-            _learningDeliveries.Add(new LearningDelivery {LearnerId = _learners[0].Id, FundingModel = fundingModel2, CompletionStatus = 2});
+            _learningDeliveries.Add(new LearningDelivery {LearnerId = _learners[0].Id, FundingModel = fundingModel1, CompletionStatus = 6}); // match
+            _learningDeliveries.Add(new LearningDelivery {LearnerId = _learners[0].Id, FundingModel = fundingModel2, CompletionStatus = 6}); // match
+            _learningDeliveries.Add(new LearningDelivery {LearnerId = _learners[0].Id, FundingModel = fundingModel2, CompletionStatus = 1});
 
             _learners.Add(new Learner {Id = Guid.NewGuid(), Ukprn = ukprn});
-            _learningDeliveries.Add(new LearningDelivery {LearnerId = _learners[1].Id, FundingModel = fundingModel1, CompletionStatus = 1}); // match
+            _learningDeliveries.Add(new LearningDelivery {LearnerId = _learners[1].Id, FundingModel = fundingModel1, CompletionStatus = 6}); // match
             _learningDeliveries.Add(new LearningDelivery {LearnerId = _learners[1].Id, FundingModel = fundingModel2, CompletionStatus = 2});
 
             _learners.Add(new Learner {Id = Guid.NewGuid(), Ukprn = ukprn + 1000});
-            _learningDeliveries.Add(new LearningDelivery {LearnerId = _learners[2].Id, FundingModel = fundingModel1, CompletionStatus = 1});
+            _learningDeliveries.Add(new LearningDelivery {LearnerId = _learners[2].Id, FundingModel = fundingModel1, CompletionStatus = 6});
 
             // Act
-            var actual = await _repository.GetCountOfContinuingLearnersAtProviderWithFundingModelsAsync(
+            var actual = await _repository.GetCountOfLearnersOnABreakAtProviderAsync(
                 ukprn,
-                new[] {fundingModel1, fundingModel2},
                 CancellationToken.None);
 
             // Assert

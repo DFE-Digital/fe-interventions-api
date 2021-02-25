@@ -100,6 +100,9 @@ namespace Dfe.FE.Interventions.Application.FeProviders
                 ukprn,
                 new[] {99},
                 cancellationToken);
+            var numberOfLearnersOnABreak = await _learnerRepository.GetCountOfLearnersOnABreakAtProviderAsync(
+                ukprn,
+                cancellationToken);
 
             return new FeProviderStatistics
             {
@@ -109,6 +112,7 @@ namespace Dfe.FE.Interventions.Application.FeProviders
                 NumberOfAdultEducationLearners = numberOfAdultEducationLearners,
                 NumberOfOtherFundingLearners = numberOfOtherFundingLearners,
                 NumberOfNonFundedLearners = numberOfNonFundedLearners,
+                NumberOfLearnersOnABreak = numberOfLearnersOnABreak,
             };
         }
 
