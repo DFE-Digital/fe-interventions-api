@@ -40,6 +40,11 @@ namespace Dfe.FE.Interventions.Application.UnitTests.FeProvidersTests.FeProvider
                 });
 
             _learningDeliveryRepositoryMock = new Mock<ILearningDeliveryRepository>();
+            _learningDeliveryRepositoryMock.Setup(repo => repo.GetCountOfAimTypesDeliveredByProviderLocationAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new Dictionary<string, int>
+                {
+                    {"AA1 1AA", 456},
+                });
 
             _locationServiceMock = new Mock<ILocationService>();
 
@@ -105,6 +110,28 @@ namespace Dfe.FE.Interventions.Application.UnitTests.FeProvidersTests.FeProvider
             Assert.AreEqual(123, actual.Single(x => x.DeliveryLocationPostcode == "AA1 1AA").NumberOfLearnersOnABreak);
             Assert.IsNotNull(actual.SingleOrDefault(x => x.DeliveryLocationPostcode == "BB2 2BB"));
             Assert.AreEqual(456, actual.Single(x => x.DeliveryLocationPostcode == "BB2 2BB").NumberOfLearnersOnABreak);
+        }
+
+        [Test]
+        public async Task ThenItShouldReturnNumberOfAimTypesFromLearningDeliveryRepo()
+        {
+            var ukprn = 12345678;
+
+            _learningDeliveryRepositoryMock.Setup(repo => repo.GetCountOfAimTypesDeliveredByProviderLocationAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new Dictionary<string, int>
+                {
+                    {"AA1 1AA", 123},
+                    {"BB2 2BB", 456},
+                });
+
+            var actual = await _manager.RetrieveLocationStatisticsAsync(ukprn, CancellationToken.None);
+
+            Assert.IsNotNull(actual);
+            Assert.AreEqual(2, actual.Length);
+            Assert.IsNotNull(actual.SingleOrDefault(x => x.DeliveryLocationPostcode == "AA1 1AA"));
+            Assert.AreEqual(123, actual.Single(x => x.DeliveryLocationPostcode == "AA1 1AA").NumberOfAimTypes);
+            Assert.IsNotNull(actual.SingleOrDefault(x => x.DeliveryLocationPostcode == "BB2 2BB"));
+            Assert.AreEqual(456, actual.Single(x => x.DeliveryLocationPostcode == "BB2 2BB").NumberOfAimTypes);
         }
 
         [TestCase(1234567)]

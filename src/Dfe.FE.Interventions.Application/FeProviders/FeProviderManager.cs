@@ -137,9 +137,11 @@ namespace Dfe.FE.Interventions.Application.FeProviders
 
             var numberOfActiveLearners = await _learnerRepository.GetCountOfContinuingLearnersByProviderLocationAsync(ukprn, cancellationToken);
             var numberOfLearnersOnABreak = await _learnerRepository.GetCountOfLearnersOnABreakByProviderLocationAsync(ukprn, cancellationToken);
+            var numberOfAimTypes = await _learningDeliveryRepository.GetCountOfAimTypesDeliveredByProviderLocationAsync(ukprn, cancellationToken);
 
             var allProviderLocations = numberOfActiveLearners.Keys
                 .Concat(numberOfLearnersOnABreak.Keys)
+                .Concat(numberOfAimTypes.Keys)
                 .Distinct()
                 .ToArray();
             int GetDictionaryValue (Dictionary<string, int> dict, string key)
@@ -157,6 +159,7 @@ namespace Dfe.FE.Interventions.Application.FeProviders
                     DeliveryLocationPostcode = postcode,
                     NumberOfActiveLearners = GetDictionaryValue(numberOfActiveLearners, postcode),
                     NumberOfLearnersOnABreak = GetDictionaryValue(numberOfLearnersOnABreak, postcode),
+                    NumberOfAimTypes = GetDictionaryValue(numberOfAimTypes, postcode),
                 };
             }
             

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Xml;
 using Dfe.FE.Interventions.Domain;
 using Dfe.FE.Interventions.Domain.LearningDeliveries;
 using Microsoft.EntityFrameworkCore;
@@ -93,6 +92,33 @@ namespace Dfe.FE.Interventions.Data.LearningDeliveries
             var countOfLearners = await query.CountAsync(cancellationToken);
 
             return countOfLearners;
+        }
+
+        public async Task<Dictionary<string, int>> GetCountOfAimTypesDeliveredByProviderLocationAsync(int ukprn, CancellationToken cancellationToken)
+        {
+            var query = _dbContext.LearningDeliveries
+                .Join(_dbContext.Learners,
+                    ld => ld.LearnerId,
+                    l => l.Id,
+                    (ld, l) => new
+                    {
+                        ld.DeliveryLocationPostcode,
+                        l.Ukprn,
+                        ld.AimType,
+                    })
+                .Where(x => x.Ukprn == ukprn && x.DeliveryLocationPostcode != null && x.AimType != null)
+                .GroupBy(x => x.DeliveryLocationPostcode)
+                .Select(g => new
+                {
+                    Postcode = g.Key,
+                    NumberOfAims = g.Select(x => x.AimType).Distinct().Count(),
+                });
+
+            var result = await query.ToListAsync(cancellationToken);
+
+            return result.ToDictionary(
+                x => x.Postcode,
+                x => x.NumberOfAims);
         }
     }
 }
