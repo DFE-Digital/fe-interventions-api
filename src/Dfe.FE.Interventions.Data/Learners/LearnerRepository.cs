@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -123,6 +124,33 @@ namespace Dfe.FE.Interventions.Data.Learners
             var countOfLearners = await query.CountAsync(cancellationToken);
 
             return countOfLearners;
+        }
+
+        public async Task<Dictionary<string, int>> GetCountOfLearnersByProviderLocationAsync(int ukprn, CancellationToken cancellationToken)
+        {
+            var query = _dbContext.Learners
+                .Join(_dbContext.LearningDeliveries,
+                    l => l.Id,
+                    ld => ld.LearnerId,
+                    (l, ld) => new
+                    {
+                        ld.DeliveryLocationPostcode,
+                        l.Ukprn,
+                        LearnerId = l.Id
+                    })
+                .Where(x => x.Ukprn == ukprn && x.DeliveryLocationPostcode != null)
+                .GroupBy(x => x.DeliveryLocationPostcode)
+                .Select(g => new
+                {
+                    Postcode = g.Key,
+                    NumberOfLearners = g.Select(x => x.LearnerId).Distinct().Count(),
+                });
+
+            var result = await query.ToListAsync(cancellationToken);
+
+            return result.ToDictionary(
+                x => x.Postcode,
+                x => x.NumberOfLearners);
         }
     }
 }

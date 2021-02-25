@@ -1,4 +1,6 @@
-﻿using System.Threading;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Dfe.FE.Interventions.Application.LearningDeliveries;
 using Dfe.FE.Interventions.Domain;
@@ -15,6 +17,7 @@ namespace Dfe.FE.Interventions.Application.FeProviders
         Task<PagedSearchResult<FeProviderSynopsis>> SearchAsync(int? ukprn, string legalName, int pageNumber, CancellationToken cancellationToken);
         Task<FeProvider> RetrieveAsync(int ukprn, CancellationToken cancellationToken);
         Task<FeProviderStatistics> RetrieveStatisticsAsync(int ukprn, CancellationToken cancellationToken);
+        Task<FeProviderLocationStatistics[]> RetrieveLocationStatisticsAsync(int ukprn, CancellationToken cancellationToken);
 
         Task UpsertProvider(FeProvider provider, CancellationToken cancellationToken);
     }
@@ -123,6 +126,38 @@ namespace Dfe.FE.Interventions.Application.FeProviders
                 NumberOfLearnersOnABreak = numberOfLearnersOnABreak,
                 NumberOfAimTypes = numberOfAimTypes,
             };
+        }
+
+        public async Task<FeProviderLocationStatistics[]> RetrieveLocationStatisticsAsync(int ukprn, CancellationToken cancellationToken)
+        {
+            if (ukprn < 10000000 || ukprn > 99999999)
+            {
+                throw new InvalidRequestException("UKPRN must be an 8 digit number");
+            }
+
+            var numberOfActiveLearners = await _learnerRepository.GetCountOfLearnersByProviderLocationAsync(ukprn, cancellationToken);
+
+            var allProviderLocations = numberOfActiveLearners.Keys.ToArray();
+
+            
+            int GetDictionaryValue (Dictionary<string, int> dict, string key)
+            {
+                return dict.ContainsKey(key) ? dict[key] : 0;
+            };
+
+            
+            var statistics = new FeProviderLocationStatistics[allProviderLocations.Length];
+            for (var i = 0; i < statistics.Length; i++)
+            {
+                var postcode = allProviderLocations[i];
+                statistics[i] = new FeProviderLocationStatistics
+                {
+                    DeliveryLocationPostcode = postcode,
+                    NumberOfActiveLearners = GetDictionaryValue(numberOfActiveLearners, postcode),
+                };
+            }
+            
+            return statistics;
         }
 
         public async Task UpsertProvider(FeProvider provider, CancellationToken cancellationToken)

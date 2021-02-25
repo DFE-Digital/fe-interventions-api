@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -14,5 +15,7 @@ namespace Dfe.FE.Interventions.Domain.Learners
 
         Task<int> GetCountOfLearnersOnABreakAtProviderAsync(int ukprn, CancellationToken cancellationToken);
         Task<int> GetCountOfContinuingLearnersAtProviderWithFundingModelsAsync(int ukprn, int[] fundingModels, CancellationToken cancellationToken);
+
+        Task<Dictionary<string, int>> GetCountOfLearnersByProviderLocationAsync(int ukprn, CancellationToken cancellationToken);
     }
 }

@@ -182,5 +182,49 @@ namespace Dfe.FE.Interventions.Api.Controllers
                 });
             }
         }
+
+        [HttpGet, Route("{ukprn}/locations")]
+        public async Task<IActionResult> GetLocationsAsync(
+            string ukprn,
+            CancellationToken cancellationToken)
+        {
+            if (!int.TryParse(ukprn, out var parsedUkprn))
+            {
+                return BadRequest(new ProblemDetails
+                {
+                    Detail = "UKPRN must be an 8 digit number",
+                });
+            }
+            
+            try
+            {
+                var provider = await _feProviderManager.RetrieveAsync(parsedUkprn, cancellationToken);
+                if (provider == null)
+                {
+                    return NotFound();
+                }
+            }
+            catch (InvalidRequestException ex)
+            {
+                return BadRequest(new ProblemDetails
+                {
+                    Detail = ex.Message,
+                });
+            }
+
+            try
+            {
+                var locations = await _feProviderManager.RetrieveLocationStatisticsAsync(parsedUkprn, cancellationToken);
+
+                return Ok(locations);
+            }
+            catch (InvalidRequestException ex)
+            {
+                return BadRequest(new ProblemDetails
+                {
+                    Detail = ex.Message,
+                });
+            }
+        }
     }
 }
