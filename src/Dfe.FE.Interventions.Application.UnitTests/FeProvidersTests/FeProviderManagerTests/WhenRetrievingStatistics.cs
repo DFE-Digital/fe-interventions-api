@@ -139,6 +139,24 @@ namespace Dfe.FE.Interventions.Application.UnitTests.FeProvidersTests.FeProvider
                 Times.Once);
         }
 
+        [Test]
+        public async Task ThenItShouldPopulateNumberOfActiveLearnersFromLearnerRepo()
+        {
+            var ukprn = 12345678;
+            var expected = 45;
+            var cancellationToken = new CancellationToken();
+
+            _learnerRepositoryMock.Setup(repo =>
+                    repo.GetCountOfContinuingLearnersAtProviderAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(expected);
+
+            var actual = await _manager.RetrieveStatisticsAsync(ukprn, cancellationToken);
+
+            Assert.AreEqual(expected, actual.NumberOfActiveLearners);
+            _learnerRepositoryMock.Verify(repo => repo.GetCountOfContinuingLearnersAtProviderAsync(ukprn, cancellationToken),
+                Times.Once);
+        }
+
         [TestCase(1234567)]
         [TestCase(123456789)]
         public void AndUkprnIsNot8DigitsThenItShouldThrowAnInvalidRequestException(int ukprn)

@@ -77,6 +77,9 @@ namespace Dfe.FE.Interventions.Application.FeProviders
             }
 
             // Could probably run these concurrently, but need to make changes to how we get context
+            var numberOfActiveLearners = await _learnerRepository.GetCountOfContinuingLearnersAtProviderAsync(
+                ukprn,
+                cancellationToken);
             var numberOfApprenticeshipLearners = await _learnerRepository.GetCountOfContinuingLearnersAtProviderWithFundingModelsAsync(
                 ukprn,
                 new[] {36},
@@ -100,6 +103,7 @@ namespace Dfe.FE.Interventions.Application.FeProviders
 
             return new FeProviderStatistics
             {
+                NumberOfActiveLearners = numberOfActiveLearners,
                 NumberOfApprenticeshipLearners = numberOfApprenticeshipLearners,
                 NumberOfLearners16To19 = numberOfLearners16To19,
                 NumberOfAdultEducationLearners = numberOfAdultEducationLearners,
