@@ -126,7 +126,7 @@ namespace Dfe.FE.Interventions.Data.Learners
             return countOfLearners;
         }
 
-        public async Task<Dictionary<string, int>> GetCountOfLearnersByProviderLocationAsync(int ukprn, CancellationToken cancellationToken)
+        public async Task<Dictionary<string, int>> GetCountOfContinuingLearnersByProviderLocationAsync(int ukprn, CancellationToken cancellationToken)
         {
             var query = _dbContext.Learners
                 .Join(_dbContext.LearningDeliveries,
@@ -136,9 +136,38 @@ namespace Dfe.FE.Interventions.Data.Learners
                     {
                         ld.DeliveryLocationPostcode,
                         l.Ukprn,
-                        LearnerId = l.Id
+                        LearnerId = l.Id,
+                        ld.CompletionStatus,
                     })
-                .Where(x => x.Ukprn == ukprn && x.DeliveryLocationPostcode != null)
+                .Where(x => x.Ukprn == ukprn && x.DeliveryLocationPostcode != null && x.CompletionStatus == 1)
+                .GroupBy(x => x.DeliveryLocationPostcode)
+                .Select(g => new
+                {
+                    Postcode = g.Key,
+                    NumberOfLearners = g.Select(x => x.LearnerId).Distinct().Count(),
+                });
+
+            var result = await query.ToListAsync(cancellationToken);
+
+            return result.ToDictionary(
+                x => x.Postcode,
+                x => x.NumberOfLearners);
+        }
+
+        public async Task<Dictionary<string, int>> GetCountOfLearnersOnABreakByProviderLocationAsync(int ukprn, CancellationToken cancellationToken)
+        {
+            var query = _dbContext.Learners
+                .Join(_dbContext.LearningDeliveries,
+                    l => l.Id,
+                    ld => ld.LearnerId,
+                    (l, ld) => new
+                    {
+                        ld.DeliveryLocationPostcode,
+                        l.Ukprn,
+                        LearnerId = l.Id,
+                        ld.CompletionStatus,
+                    })
+                .Where(x => x.Ukprn == ukprn && x.DeliveryLocationPostcode != null && x.CompletionStatus == 6)
                 .GroupBy(x => x.DeliveryLocationPostcode)
                 .Select(g => new
                 {

@@ -16,6 +16,7 @@ namespace Dfe.FE.Interventions.Domain.Learners
         Task<int> GetCountOfLearnersOnABreakAtProviderAsync(int ukprn, CancellationToken cancellationToken);
         Task<int> GetCountOfContinuingLearnersAtProviderWithFundingModelsAsync(int ukprn, int[] fundingModels, CancellationToken cancellationToken);
 
-        Task<Dictionary<string, int>> GetCountOfLearnersByProviderLocationAsync(int ukprn, CancellationToken cancellationToken);
+        Task<Dictionary<string, int>> GetCountOfContinuingLearnersByProviderLocationAsync(int ukprn, CancellationToken cancellationToken);
+        Task<Dictionary<string, int>> GetCountOfLearnersOnABreakByProviderLocationAsync(int ukprn, CancellationToken cancellationToken);
     }
 }

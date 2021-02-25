@@ -12,7 +12,7 @@ using NUnit.Framework;
 
 namespace Dfe.FE.Interventions.Data.UnitTests.LearnersTests.LearnerRepositoryTests
 {
-    public class WhenGettingCountOfLearnersByProviderLocation
+    public class WhenGettingCountOfLearnersOnABreakByProviderLocation
     {
         
         private List<Learner> _learners;
@@ -37,7 +37,7 @@ namespace Dfe.FE.Interventions.Data.UnitTests.LearnersTests.LearnerRepositoryTes
         }
 
         [Test]
-        public async Task ThenItShouldReturnCorrectCountOfAimTypesForProvider()
+        public async Task ThenItShouldReturnCorrectCountOfLearnersForProviderAndLocations()
         {
             var ukprn = 1234578;
             var postcode1 = "AA1 1AA";
@@ -45,19 +45,20 @@ namespace Dfe.FE.Interventions.Data.UnitTests.LearnersTests.LearnerRepositoryTes
 
             // Arrange
             _learners.Add(new Learner {Id = Guid.NewGuid(), Ukprn = ukprn});
-            _learningDeliveries.Add(new LearningDelivery {LearnerId = _learners[0].Id, DeliveryLocationPostcode = postcode1});
-            _learningDeliveries.Add(new LearningDelivery {LearnerId = _learners[0].Id, DeliveryLocationPostcode = postcode1});
+            _learningDeliveries.Add(new LearningDelivery {LearnerId = _learners[0].Id, DeliveryLocationPostcode = postcode1, CompletionStatus = 6});
+            _learningDeliveries.Add(new LearningDelivery {LearnerId = _learners[0].Id, DeliveryLocationPostcode = postcode1, CompletionStatus = 6});
+            _learningDeliveries.Add(new LearningDelivery {LearnerId = _learners[0].Id, DeliveryLocationPostcode = postcode1, CompletionStatus = 2});
 
             _learners.Add(new Learner {Id = Guid.NewGuid(), Ukprn = ukprn});
-            _learningDeliveries.Add(new LearningDelivery {LearnerId = _learners[1].Id, DeliveryLocationPostcode = postcode1});
-            _learningDeliveries.Add(new LearningDelivery {LearnerId = _learners[1].Id, DeliveryLocationPostcode = postcode2});
-            _learningDeliveries.Add(new LearningDelivery {LearnerId = _learners[1].Id, DeliveryLocationPostcode = null});
+            _learningDeliveries.Add(new LearningDelivery {LearnerId = _learners[1].Id, DeliveryLocationPostcode = postcode1, CompletionStatus = 6});
+            _learningDeliveries.Add(new LearningDelivery {LearnerId = _learners[1].Id, DeliveryLocationPostcode = postcode2, CompletionStatus = 6});
+            _learningDeliveries.Add(new LearningDelivery {LearnerId = _learners[1].Id, DeliveryLocationPostcode = null, CompletionStatus = 6});
 
             _learners.Add(new Learner {Id = Guid.NewGuid(), Ukprn = ukprn + 1000});
-            _learningDeliveries.Add(new LearningDelivery {LearnerId = _learners[2].Id, DeliveryLocationPostcode = postcode2});
+            _learningDeliveries.Add(new LearningDelivery {LearnerId = _learners[2].Id, DeliveryLocationPostcode = postcode2, CompletionStatus = 6});
 
             // Act
-            var actual = await _repository.GetCountOfLearnersByProviderLocationAsync(
+            var actual = await _repository.GetCountOfLearnersOnABreakByProviderLocationAsync(
                 ukprn,
                 CancellationToken.None);
 

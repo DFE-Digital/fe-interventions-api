@@ -28,10 +28,15 @@ namespace Dfe.FE.Interventions.Application.UnitTests.FeProvidersTests.FeProvider
             _feProviderRepositoryMock = new Mock<IFeProviderRepository>();
 
             _learnerRepositoryMock = new Mock<ILearnerRepository>();
-            _learnerRepositoryMock.Setup(repo => repo.GetCountOfLearnersByProviderLocationAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+            _learnerRepositoryMock.Setup(repo => repo.GetCountOfContinuingLearnersByProviderLocationAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new Dictionary<string, int>
                 {
                     {"AA1 1AA", 123},
+                });
+            _learnerRepositoryMock.Setup(repo => repo.GetCountOfLearnersOnABreakByProviderLocationAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new Dictionary<string, int>
+                {
+                    {"AA1 1AA", 456},
                 });
 
             _learningDeliveryRepositoryMock = new Mock<ILearningDeliveryRepository>();
@@ -63,7 +68,7 @@ namespace Dfe.FE.Interventions.Application.UnitTests.FeProvidersTests.FeProvider
         {
             var ukprn = 12345678;
 
-            _learnerRepositoryMock.Setup(repo => repo.GetCountOfLearnersByProviderLocationAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+            _learnerRepositoryMock.Setup(repo => repo.GetCountOfContinuingLearnersByProviderLocationAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new Dictionary<string, int>
                 {
                     {"AA1 1AA", 123},
@@ -76,6 +81,30 @@ namespace Dfe.FE.Interventions.Application.UnitTests.FeProvidersTests.FeProvider
             Assert.AreEqual(2, actual.Length);
             Assert.IsNotNull(actual.SingleOrDefault(x => x.DeliveryLocationPostcode == "AA1 1AA"));
             Assert.AreEqual(123, actual.Single(x => x.DeliveryLocationPostcode == "AA1 1AA").NumberOfActiveLearners);
+            Assert.IsNotNull(actual.SingleOrDefault(x => x.DeliveryLocationPostcode == "BB2 2BB"));
+            Assert.AreEqual(456, actual.Single(x => x.DeliveryLocationPostcode == "BB2 2BB").NumberOfActiveLearners);
+        }
+
+        [Test]
+        public async Task ThenItShouldReturnNumberOfLearnersOnABreakFromLearnerRepo()
+        {
+            var ukprn = 12345678;
+
+            _learnerRepositoryMock.Setup(repo => repo.GetCountOfLearnersOnABreakByProviderLocationAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new Dictionary<string, int>
+                {
+                    {"AA1 1AA", 123},
+                    {"BB2 2BB", 456},
+                });
+
+            var actual = await _manager.RetrieveLocationStatisticsAsync(ukprn, CancellationToken.None);
+
+            Assert.IsNotNull(actual);
+            Assert.AreEqual(2, actual.Length);
+            Assert.IsNotNull(actual.SingleOrDefault(x => x.DeliveryLocationPostcode == "AA1 1AA"));
+            Assert.AreEqual(123, actual.Single(x => x.DeliveryLocationPostcode == "AA1 1AA").NumberOfLearnersOnABreak);
+            Assert.IsNotNull(actual.SingleOrDefault(x => x.DeliveryLocationPostcode == "BB2 2BB"));
+            Assert.AreEqual(456, actual.Single(x => x.DeliveryLocationPostcode == "BB2 2BB").NumberOfLearnersOnABreak);
         }
 
         [TestCase(1234567)]

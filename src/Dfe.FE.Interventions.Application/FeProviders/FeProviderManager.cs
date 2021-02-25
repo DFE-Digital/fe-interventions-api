@@ -135,11 +135,13 @@ namespace Dfe.FE.Interventions.Application.FeProviders
                 throw new InvalidRequestException("UKPRN must be an 8 digit number");
             }
 
-            var numberOfActiveLearners = await _learnerRepository.GetCountOfLearnersByProviderLocationAsync(ukprn, cancellationToken);
+            var numberOfActiveLearners = await _learnerRepository.GetCountOfContinuingLearnersByProviderLocationAsync(ukprn, cancellationToken);
+            var numberOfLearnersOnABreak = await _learnerRepository.GetCountOfLearnersOnABreakByProviderLocationAsync(ukprn, cancellationToken);
 
-            var allProviderLocations = numberOfActiveLearners.Keys.ToArray();
-
-            
+            var allProviderLocations = numberOfActiveLearners.Keys
+                .Concat(numberOfLearnersOnABreak.Keys)
+                .Distinct()
+                .ToArray();
             int GetDictionaryValue (Dictionary<string, int> dict, string key)
             {
                 return dict.ContainsKey(key) ? dict[key] : 0;
@@ -154,6 +156,7 @@ namespace Dfe.FE.Interventions.Application.FeProviders
                 {
                     DeliveryLocationPostcode = postcode,
                     NumberOfActiveLearners = GetDictionaryValue(numberOfActiveLearners, postcode),
+                    NumberOfLearnersOnABreak = GetDictionaryValue(numberOfLearnersOnABreak, postcode),
                 };
             }
             
