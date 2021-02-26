@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Dfe.FE.Interventions.Domain;
 using Dfe.FE.Interventions.Domain.Learners;
 using Dfe.FE.Interventions.Domain.LearningDeliveries;
+using Dfe.FE.Interventions.Domain.Locations;
 using Microsoft.Extensions.Logging;
 
 namespace Dfe.FE.Interventions.Application.LearningDeliveries
@@ -18,15 +19,18 @@ namespace Dfe.FE.Interventions.Application.LearningDeliveries
     {
         private readonly ILearningDeliveryRepository _learningDeliveryRepository;
         private readonly ILearnerRepository _learnerRepository;
+        private readonly ILocationService _locationService;
         private readonly ILogger<LearningDeliveryManager> _logger;
 
         public LearningDeliveryManager(
             ILearningDeliveryRepository learningDeliveryRepository,
             ILearnerRepository learnerRepository,
+            ILocationService locationService,
             ILogger<LearningDeliveryManager> logger)
         {
             _learningDeliveryRepository = learningDeliveryRepository;
             _learnerRepository = learnerRepository;
+            _locationService = locationService;
             _logger = logger;
         }
 
@@ -41,14 +45,14 @@ namespace Dfe.FE.Interventions.Application.LearningDeliveries
             {
                 throw new InvalidRequestException("Page must be a number greater than 0");
             }
-            
+
             var result = await _learningDeliveryRepository.ListForProviderAsync(ukprn, pageNumber, PaginationConstants.PageSize, cancellationToken);
             if (pageNumber > result.TotalNumberOfPages)
             {
                 throw new InvalidRequestException("Page number exceeds available pages. " +
                                                   $"Requested page {pageNumber}, but only {result.TotalNumberOfPages} pages available");
             }
-            
+
             return result;
         }
 
@@ -79,6 +83,18 @@ namespace Dfe.FE.Interventions.Application.LearningDeliveries
             if (learner == null)
             {
                 throw new InvalidRequestException($"Cannot find learner with id {learnerId}");
+            }
+
+            // Update region
+            foreach (var learningDelivery in learningDeliveries)
+            {
+                var location = string.IsNullOrEmpty(learningDelivery.DeliveryLocationPostcode)
+                    ? null
+                    : await _locationService.GetByPostcodeAsync(learningDelivery.DeliveryLocationPostcode, cancellationToken);
+                if (location != null)
+                {
+                    learningDelivery.DeliveryLocationRegion = location.Region;
+                }
             }
 
             // Store

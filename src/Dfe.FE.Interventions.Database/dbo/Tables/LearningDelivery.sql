@@ -13,6 +13,7 @@ CREATE TABLE [dbo].[LearningDelivery]
   [OutcomeGrade] NVARCHAR(50) NULL,
   [WithdrawalReason] INT NULL,
   [DeliveryLocationPostcode] VARCHAR(10),
+  [DeliveryLocationRegion] NVARCHAR(255),
   [ProgrammeType] INT NULL,
 
   CONSTRAINT [FK_LearningDelivery_Learner] FOREIGN KEY (LearnerId) REFERENCES [dbo].[Learner](Id)

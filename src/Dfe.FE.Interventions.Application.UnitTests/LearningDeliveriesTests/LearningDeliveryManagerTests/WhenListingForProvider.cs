@@ -1,11 +1,10 @@
-using System;
 using System.Threading;
 using System.Threading.Tasks;
-using AutoFixture.NUnit3;
 using Dfe.FE.Interventions.Application.LearningDeliveries;
 using Dfe.FE.Interventions.Domain;
 using Dfe.FE.Interventions.Domain.Learners;
 using Dfe.FE.Interventions.Domain.LearningDeliveries;
+using Dfe.FE.Interventions.Domain.Locations;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
@@ -16,6 +15,7 @@ namespace Dfe.FE.Interventions.Application.UnitTests.LearningDeliveriesTests.Lea
     {
         private Mock<ILearningDeliveryRepository> _learningDeliveryRepositoryMock;
         private Mock<ILearnerRepository> _learnerRepositoryMock;
+        private Mock<ILocationService> _locationServiceMock;
         private Mock<ILogger<LearningDeliveryManager>> _loggerMock;
         private LearningDeliveryManager _manager;
 
@@ -32,11 +32,14 @@ namespace Dfe.FE.Interventions.Application.UnitTests.LearningDeliveriesTests.Lea
 
             _learnerRepositoryMock = new Mock<ILearnerRepository>();
 
+            _locationServiceMock = new Mock<ILocationService>();
+
             _loggerMock = new Mock<ILogger<LearningDeliveryManager>>();
 
             _manager = new LearningDeliveryManager(
                 _learningDeliveryRepositoryMock.Object,
                 _learnerRepositoryMock.Object,
+                _locationServiceMock.Object,
                 _loggerMock.Object);
         }
 

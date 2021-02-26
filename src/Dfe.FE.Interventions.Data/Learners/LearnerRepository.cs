@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -26,7 +27,7 @@ namespace Dfe.FE.Interventions.Data.Learners
         {
             bool created;
             Guid key;
-            
+
             var existingLearner = await _dbContext.Learners
                 .Where(x => x.Ukprn == learner.Ukprn &&
                             x.LearnRefNumber == learner.LearnRefNumber)
@@ -39,24 +40,146 @@ namespace Dfe.FE.Interventions.Data.Learners
                 }
 
                 _dbContext.Learners.Add(learner);
-                
+
                 key = learner.Id;
                 created = true;
             }
             else
             {
                 existingLearner.UpdateFrom(learner);
-                
+
                 key = existingLearner.Id;
                 created = false;
             }
-            
+
             await _dbContext.CommitAsync(cancellationToken);
             return new UpsertResult<Guid>
             {
                 Created = created,
                 Key = key,
             };
+        }
+
+        public async Task<int> GetCountOfContinuingLearnersAtProviderAsync(int ukprn, CancellationToken cancellationToken)
+        {
+            var query = _dbContext.Learners
+                .Join(_dbContext.LearningDeliveries,
+                    l => l.Id,
+                    ld => ld.LearnerId,
+                    (l, ld) => new
+                    {
+                        l.Id,
+                        l.Ukprn,
+                        ld.FundingModel,
+                        ld.CompletionStatus
+                    })
+                .Where(x => x.Ukprn == ukprn && x.CompletionStatus == 1)
+                .Select(x => x.Id)
+                .Distinct();
+
+            var countOfLearners = await query.CountAsync(cancellationToken);
+
+            return countOfLearners;
+        }
+
+        public async Task<int> GetCountOfLearnersOnABreakAtProviderAsync(int ukprn, CancellationToken cancellationToken)
+        {
+            var query = _dbContext.Learners
+                .Join(_dbContext.LearningDeliveries,
+                    l => l.Id,
+                    ld => ld.LearnerId,
+                    (l, ld) => new
+                    {
+                        l.Id,
+                        l.Ukprn,
+                        ld.FundingModel,
+                        ld.CompletionStatus
+                    })
+                .Where(x => x.Ukprn == ukprn && x.CompletionStatus == 6)
+                .Select(x => x.Id)
+                .Distinct();
+
+            var countOfLearners = await query.CountAsync(cancellationToken);
+
+            return countOfLearners;
+        }
+
+        public async Task<int> GetCountOfContinuingLearnersAtProviderWithFundingModelsAsync(int ukprn, int[] fundingModels, CancellationToken cancellationToken)
+        {
+            var query = _dbContext.Learners
+                .Join(_dbContext.LearningDeliveries,
+                    l => l.Id,
+                    ld => ld.LearnerId,
+                    (l, ld) => new
+                    {
+                        l.Id,
+                        l.Ukprn,
+                        ld.FundingModel,
+                        ld.CompletionStatus
+                    })
+                .Where(x => x.Ukprn == ukprn && x.FundingModel != null && fundingModels.Contains(x.FundingModel.Value) && x.CompletionStatus == 1)
+                .Select(x => x.Id)
+                .Distinct();
+
+            var countOfLearners = await query.CountAsync(cancellationToken);
+
+            return countOfLearners;
+        }
+
+        public async Task<Dictionary<string, int>> GetCountOfContinuingLearnersByProviderLocationAsync(int ukprn, CancellationToken cancellationToken)
+        {
+            var query = _dbContext.Learners
+                .Join(_dbContext.LearningDeliveries,
+                    l => l.Id,
+                    ld => ld.LearnerId,
+                    (l, ld) => new
+                    {
+                        ld.DeliveryLocationPostcode,
+                        l.Ukprn,
+                        LearnerId = l.Id,
+                        ld.CompletionStatus,
+                    })
+                .Where(x => x.Ukprn == ukprn && x.DeliveryLocationPostcode != null && x.CompletionStatus == 1)
+                .GroupBy(x => x.DeliveryLocationPostcode)
+                .Select(g => new
+                {
+                    Postcode = g.Key,
+                    NumberOfLearners = g.Select(x => x.LearnerId).Distinct().Count(),
+                });
+
+            var result = await query.ToListAsync(cancellationToken);
+
+            return result.ToDictionary(
+                x => x.Postcode,
+                x => x.NumberOfLearners);
+        }
+
+        public async Task<Dictionary<string, int>> GetCountOfLearnersOnABreakByProviderLocationAsync(int ukprn, CancellationToken cancellationToken)
+        {
+            var query = _dbContext.Learners
+                .Join(_dbContext.LearningDeliveries,
+                    l => l.Id,
+                    ld => ld.LearnerId,
+                    (l, ld) => new
+                    {
+                        ld.DeliveryLocationPostcode,
+                        l.Ukprn,
+                        LearnerId = l.Id,
+                        ld.CompletionStatus,
+                    })
+                .Where(x => x.Ukprn == ukprn && x.DeliveryLocationPostcode != null && x.CompletionStatus == 6)
+                .GroupBy(x => x.DeliveryLocationPostcode)
+                .Select(g => new
+                {
+                    Postcode = g.Key,
+                    NumberOfLearners = g.Select(x => x.LearnerId).Distinct().Count(),
+                });
+
+            var result = await query.ToListAsync(cancellationToken);
+
+            return result.ToDictionary(
+                x => x.Postcode,
+                x => x.NumberOfLearners);
         }
     }
 }

@@ -18,7 +18,8 @@ namespace Dfe.FE.Interventions.Data.LearningDeliveries
             _dbContext = dbContext;
         }
 
-        public async Task<PagedSearchResult<LearningDeliverySynopsis>> ListForProviderAsync(int ukprn, int pageNumber, int pageSize, CancellationToken cancellationToken)
+        public async Task<PagedSearchResult<LearningDeliverySynopsis>> ListForProviderAsync(int ukprn, int pageNumber, int pageSize,
+            CancellationToken cancellationToken)
         {
             var query = _dbContext.LearningDeliveries
                 .Join(_dbContext.Learners,
@@ -36,7 +37,7 @@ namespace Dfe.FE.Interventions.Data.LearningDeliveries
                 .Where(x => x.Ukprn == ukprn);
 
             var recordCount = await query.CountAsync(cancellationToken);
-            
+
             var skip = (pageNumber - 1) * pageSize;
             var records = await query
                 .OrderBy(x => x.LearnRefNumber)
@@ -61,15 +62,63 @@ namespace Dfe.FE.Interventions.Data.LearningDeliveries
             };
         }
 
-        public async Task ReplaceAllLearningDeliveriesForLearnerAsync(Guid learnerId, IEnumerable<LearningDelivery> learningDeliveries, CancellationToken cancellationToken)
+        public async Task ReplaceAllLearningDeliveriesForLearnerAsync(Guid learnerId, IEnumerable<LearningDelivery> learningDeliveries,
+            CancellationToken cancellationToken)
         {
             // Done this as the OTB EF method to delete by anything other than PK would be slow.
             // If moving away from SQL Server, then should look at a more generic way of doing this
             await _dbContext.ExecuteSqlAsync("DELETE FROM LearningDelivery WHERE LearnerId = {0}", new object[] {learnerId}, cancellationToken);
-            
+
             await _dbContext.LearningDeliveries.AddRangeAsync(learningDeliveries, cancellationToken);
 
             await _dbContext.CommitAsync(cancellationToken);
+        }
+
+        public async Task<int> GetCountOfAimTypesDeliveredByProviderAsync(int ukprn, CancellationToken cancellationToken)
+        {
+            var query = _dbContext.Learners
+                .Join(_dbContext.LearningDeliveries,
+                    l => l.Id,
+                    ld => ld.LearnerId,
+                    (l, ld) => new
+                    {
+                        ld.AimType,
+                        l.Ukprn,
+                    })
+                .Where(x => x.Ukprn == ukprn && x.AimType != null)
+                .Select(x => x.AimType)
+                .Distinct();
+
+            var countOfLearners = await query.CountAsync(cancellationToken);
+
+            return countOfLearners;
+        }
+
+        public async Task<Dictionary<string, int>> GetCountOfAimTypesDeliveredByProviderLocationAsync(int ukprn, CancellationToken cancellationToken)
+        {
+            var query = _dbContext.LearningDeliveries
+                .Join(_dbContext.Learners,
+                    ld => ld.LearnerId,
+                    l => l.Id,
+                    (ld, l) => new
+                    {
+                        ld.DeliveryLocationPostcode,
+                        l.Ukprn,
+                        ld.AimType,
+                    })
+                .Where(x => x.Ukprn == ukprn && x.DeliveryLocationPostcode != null && x.AimType != null)
+                .GroupBy(x => x.DeliveryLocationPostcode)
+                .Select(g => new
+                {
+                    Postcode = g.Key,
+                    NumberOfAims = g.Select(x => x.AimType).Distinct().Count(),
+                });
+
+            var result = await query.ToListAsync(cancellationToken);
+
+            return result.ToDictionary(
+                x => x.Postcode,
+                x => x.NumberOfAims);
         }
     }
 }

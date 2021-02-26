@@ -1,7 +1,12 @@
-﻿using System.Threading;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using Dfe.FE.Interventions.Application.LearningDeliveries;
 using Dfe.FE.Interventions.Domain;
 using Dfe.FE.Interventions.Domain.FeProviders;
+using Dfe.FE.Interventions.Domain.Learners;
+using Dfe.FE.Interventions.Domain.LearningDeliveries;
 using Dfe.FE.Interventions.Domain.Locations;
 using Microsoft.Extensions.Logging;
 
@@ -11,6 +16,8 @@ namespace Dfe.FE.Interventions.Application.FeProviders
     {
         Task<PagedSearchResult<FeProviderSynopsis>> SearchAsync(int? ukprn, string legalName, int pageNumber, CancellationToken cancellationToken);
         Task<FeProvider> RetrieveAsync(int ukprn, CancellationToken cancellationToken);
+        Task<FeProviderStatistics> RetrieveStatisticsAsync(int ukprn, CancellationToken cancellationToken);
+        Task<FeProviderLocationStatistics[]> RetrieveLocationStatisticsAsync(int ukprn, CancellationToken cancellationToken);
 
         Task UpsertProvider(FeProvider provider, CancellationToken cancellationToken);
     }
@@ -18,15 +25,21 @@ namespace Dfe.FE.Interventions.Application.FeProviders
     public class FeProviderManager : IFeProviderManager
     {
         private readonly IFeProviderRepository _feProviderRepository;
+        private readonly ILearnerRepository _learnerRepository;
+        private readonly ILearningDeliveryRepository _learningDeliveryRepository;
         private readonly ILocationService _locationService;
         private readonly ILogger<FeProviderManager> _logger;
 
         public FeProviderManager(
             IFeProviderRepository feProviderRepository,
+            ILearnerRepository learnerRepository,
+            ILearningDeliveryRepository learningDeliveryRepository,
             ILocationService locationService,
             ILogger<FeProviderManager> logger)
         {
             _feProviderRepository = feProviderRepository;
+            _learnerRepository = learnerRepository;
+            _learningDeliveryRepository = learningDeliveryRepository;
             _locationService = locationService;
             _logger = logger;
         }
@@ -62,6 +75,95 @@ namespace Dfe.FE.Interventions.Application.FeProviders
 
             var provider = await _feProviderRepository.RetrieveProviderAsync(ukprn, cancellationToken);
             return provider;
+        }
+
+        public async Task<FeProviderStatistics> RetrieveStatisticsAsync(int ukprn, CancellationToken cancellationToken)
+        {
+            if (ukprn < 10000000 || ukprn > 99999999)
+            {
+                throw new InvalidRequestException("UKPRN must be an 8 digit number");
+            }
+
+            // Could probably run these concurrently, but need to make changes to how we get context
+            var numberOfActiveLearners = await _learnerRepository.GetCountOfContinuingLearnersAtProviderAsync(
+                ukprn,
+                cancellationToken);
+            var numberOfApprenticeshipLearners = await _learnerRepository.GetCountOfContinuingLearnersAtProviderWithFundingModelsAsync(
+                ukprn,
+                new[] {36},
+                cancellationToken);
+            var numberOfLearners16To19 = await _learnerRepository.GetCountOfContinuingLearnersAtProviderWithFundingModelsAsync(
+                ukprn,
+                new[] {25, 82},
+                cancellationToken);
+            var numberOfAdultEducationLearners = await _learnerRepository.GetCountOfContinuingLearnersAtProviderWithFundingModelsAsync(
+                ukprn,
+                new[] {35, 81},
+                cancellationToken);
+            var numberOfOtherFundingLearners = await _learnerRepository.GetCountOfContinuingLearnersAtProviderWithFundingModelsAsync(
+                ukprn,
+                new[] {10, 70},
+                cancellationToken);
+            var numberOfNonFundedLearners = await _learnerRepository.GetCountOfContinuingLearnersAtProviderWithFundingModelsAsync(
+                ukprn,
+                new[] {99},
+                cancellationToken);
+            var numberOfLearnersOnABreak = await _learnerRepository.GetCountOfLearnersOnABreakAtProviderAsync(
+                ukprn,
+                cancellationToken);
+            var numberOfAimTypes = await _learningDeliveryRepository.GetCountOfAimTypesDeliveredByProviderAsync(
+                ukprn,
+                cancellationToken);
+
+            return new FeProviderStatistics
+            {
+                NumberOfActiveLearners = numberOfActiveLearners,
+                NumberOfApprenticeshipLearners = numberOfApprenticeshipLearners,
+                NumberOfLearners16To19 = numberOfLearners16To19,
+                NumberOfAdultEducationLearners = numberOfAdultEducationLearners,
+                NumberOfOtherFundingLearners = numberOfOtherFundingLearners,
+                NumberOfNonFundedLearners = numberOfNonFundedLearners,
+                NumberOfLearnersOnABreak = numberOfLearnersOnABreak,
+                NumberOfAimTypes = numberOfAimTypes,
+            };
+        }
+
+        public async Task<FeProviderLocationStatistics[]> RetrieveLocationStatisticsAsync(int ukprn, CancellationToken cancellationToken)
+        {
+            if (ukprn < 10000000 || ukprn > 99999999)
+            {
+                throw new InvalidRequestException("UKPRN must be an 8 digit number");
+            }
+
+            var numberOfActiveLearners = await _learnerRepository.GetCountOfContinuingLearnersByProviderLocationAsync(ukprn, cancellationToken);
+            var numberOfLearnersOnABreak = await _learnerRepository.GetCountOfLearnersOnABreakByProviderLocationAsync(ukprn, cancellationToken);
+            var numberOfAimTypes = await _learningDeliveryRepository.GetCountOfAimTypesDeliveredByProviderLocationAsync(ukprn, cancellationToken);
+
+            var allProviderLocations = numberOfActiveLearners.Keys
+                .Concat(numberOfLearnersOnABreak.Keys)
+                .Concat(numberOfAimTypes.Keys)
+                .Distinct()
+                .ToArray();
+            int GetDictionaryValue (Dictionary<string, int> dict, string key)
+            {
+                return dict.ContainsKey(key) ? dict[key] : 0;
+            };
+
+            
+            var statistics = new FeProviderLocationStatistics[allProviderLocations.Length];
+            for (var i = 0; i < statistics.Length; i++)
+            {
+                var postcode = allProviderLocations[i];
+                statistics[i] = new FeProviderLocationStatistics
+                {
+                    DeliveryLocationPostcode = postcode,
+                    NumberOfActiveLearners = GetDictionaryValue(numberOfActiveLearners, postcode),
+                    NumberOfLearnersOnABreak = GetDictionaryValue(numberOfLearnersOnABreak, postcode),
+                    NumberOfAimTypes = GetDictionaryValue(numberOfAimTypes, postcode),
+                };
+            }
+            
+            return statistics;
         }
 
         public async Task UpsertProvider(FeProvider provider, CancellationToken cancellationToken)
