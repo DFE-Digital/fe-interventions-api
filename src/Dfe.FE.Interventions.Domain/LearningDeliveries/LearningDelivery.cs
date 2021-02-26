@@ -14,6 +14,5 @@ namespace Dfe.FE.Interventions.Domain.LearningDeliveries
         public int? Outcome { get; set; }
         public string OutcomeGrade { get; set; }
         public int? WithdrawalReason { get; set; }
-        public string DeliveryLocationRegion { get; set; }
     }
 }
